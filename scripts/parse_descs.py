@@ -1,8 +1,8 @@
-# @file parseDescs.py
+# @file parse_descs.py
 # @brief Parses course information from course descriptions pages on
 #        http://coursecatalog.web.cmu.edu/ into a JSON file.
 #
-#        Usage: python parseDescs.py [INFILE] [OUTFILE]
+#        Usage: python parse_descs.py [INFILE] [OUTFILE]
 #
 #        INFILE: A file containing a list of links of pages to parse.
 #        OUTFILE: Where to place resulting JSON.
@@ -141,7 +141,7 @@ def extract_course_info(dlelement):
 # @param page: Page object to get blocks from.
 # @return: Array of course objects found on page.
 def extract_courses(page):
-    return html("dl", class_="courseblock")
+    return page("dl", class_="courseblock")
 
 
 # @function get_page
@@ -152,36 +152,47 @@ def get_page(url):
     response = urllib.request.urlopen(url)
     return bs4.BeautifulSoup(response.read())
 
-# Verify arguments
-if len(sys.argv) != 3:
-    print("Usage: parseDescs.py [INFILE] [OUTFILE]")
-    sys.exit()
 
-# Array of result course information
-results = []
+# @function parse_descs
+# @brief Parses course descriptions from links in a file, and writes
+#        them as JSON to the output file.
+# @param inpath: File path for a text file containing fully qualified
+#        URLS for course description pages, separated by newlines.
+# @param outpath: File path to write output JSON to.
+def parse_descs(inpath, outpath):
+    # Array of result course information
+    results = []
 
-# Get information
-with open(sys.argv[1], 'r') as infile:
-    print("Getting data from:")
+    # Get information
+    with open(inpath, 'r') as infile:
+        print("Getting data from:")
 
-    # Read links from file
-    for line in infile:
-        print("    " + line.strip())
+        # Read links from file
+        for line in infile:
+            print("    " + line.strip())
 
-        # Get data
-        html = get_page(line.strip())
+            # Get data
+            page = get_page(line.strip())
 
-        # Separate out course elements
-        courses = extract_courses(html)
+            # Separate out course elements
+            courses = extract_courses(page)
 
-        # Get info for each course and add to list
-        for course in courses:
-            results.append(extract_course_info(course))
+            # Get info for each course and add to list
+            for course in courses:
+                results.append(extract_course_info(course))
 
-print("Writing output to file " + sys.argv[2] + "...")
+    print("Writing output to file " + sys.argv[2] + "...")
 
-# Write to output file
-with open(sys.argv[2], 'w') as outfile:
-    json.dump(results, outfile)
+    # Write to output file
+    with open(outpath, 'w') as outfile:
+        json.dump(results, outfile)
 
-print("Done!")
+    print("Done!")
+
+if __name__ == "__main__":
+    # Verify arguments
+    if len(sys.argv) != 3:
+        print("Usage: parseDescs.py [INFILE] [OUTFILE]")
+        sys.exit()
+
+    parse_descs(sys.argv[1], sys.argv[2])
