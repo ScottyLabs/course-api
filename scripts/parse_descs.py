@@ -147,9 +147,14 @@ def extract_courses(page):
 # @function get_page
 # @brief Gets a webpage as an object
 # @param url: URL of the page to get.
-# @return: The page as a BeautifulSoup html object.
+# @return: The page as a BeautifulSoup html object, or None if an error
+#        occurred.
 def get_page(url):
-    response = urllib.request.urlopen(url)
+    try:
+        response = urllib.request.urlopen(url)
+    except (urllib.request.URLError, ValueError):
+        return None
+
     return bs4.BeautifulSoup(response.read())
 
 
@@ -169,10 +174,13 @@ def parse_descs(inpath, outpath):
 
         # Read links from file
         for line in infile:
-            print("    " + line.strip())
+            print("    " + line.strip() + ": ", end="", flush=True)
 
             # Get data
             page = get_page(line.strip())
+            if not page:
+                print("Failed!")
+                continue
 
             # Separate out course elements
             courses = extract_courses(page)
@@ -180,6 +188,8 @@ def parse_descs(inpath, outpath):
             # Get info for each course and add to list
             for course in courses:
                 results.append(extract_course_info(course))
+
+            print("Success!")
 
     print("Writing output to file " + sys.argv[2] + "...")
 
