@@ -127,7 +127,7 @@ def extract_course_info(dlelement):
     if len(blocks[0]) < 100:
         (units, semester) = extract_units_semester_info(blocks.pop(0))
     else:
-        (units, semester) = (0.0, ["F", "S", "U"]);
+        (units, semester) = (0.0, ["F", "S", "U"])
 
     # Get description
     (desc, prereqs, coreqs) = extract_desc_prereqs_coreqs(blocks)
