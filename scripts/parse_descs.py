@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # @file parse_descs.py
 # @brief Parses course information from course descriptions pages on
 #        http://coursecatalog.web.cmu.edu/ into a JSON file.
