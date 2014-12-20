@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # @file parse_descs.py
 # @brief Parses course information from course descriptions pages on
 #        http://coursecatalog.web.cmu.edu/ into a JSON file.
@@ -22,8 +23,8 @@ import bs4
 # @param dtelement: <dt> element from a course description webpage.
 # @return (num (int), name (string)): The course number and name.
 def extract_num_name(dtelement):
-    elements = dtelement.get_text().split(" ", 1)
-    num = int(re.sub("\D", "", elements[0]))
+    elements = dtelement.get_text().split(' ', 1)
+    num = int(re.sub('\D', '', elements[0]))
     return (num, elements[1])
 
 
@@ -32,35 +33,35 @@ def extract_num_name(dtelement):
 #        line.
 # @param line (string): A text line containing one or both of the units
 #        awarded or semesters offered by a course, in the form
-#        "[semesters]:[units]" or "[semesters]" or "[units]". The
-#        "units" component must contain a number.
+#        '[semesters]:[units]' or '[semesters]' or '[units]'. The
+#        'units' component must contain a number.
 # @return (units (float), semester ([string])): The number of units that
 #        the course awards, and a list of the semesters that it is
-#        offered, where "F" is fall, "S" is spring, and "U" is summer.
+#        offered, where 'F' is fall, 'S' is spring, and 'U' is summer.
 def extract_units_semester_info(line):
-    parts = line.split(":")
+    parts = line.split(':')
 
     # Extract relevant parts
     if len(parts) == 2:
         semester_text = parts[0]
-        units = float(re.sub("[^0-9.]", "", parts[1]))
-    elif "unit" in parts[0]:
-        semester_text = "All Semesters"
-        units = float(re.sub("[^0-9.]", "", parts[0]))
+        units = float(re.sub('[^0-9.]', '', parts[1]))
+    elif 'unit' in parts[0]:
+        semester_text = 'All Semesters'
+        units = float(re.sub('[^0-9.]', '', parts[0]))
     else:
         semester_text = parts[0]
         units = 0.0
 
     # Parse semesters
     semester = []
-    if "Fall" in semester_text:
-        semester.append("F")
-    if "Spring" in semester_text:
-        semester.append("S")
-    if "Summer" in semester_text:
-        semester.append("U")
-    if "All" in semester_text:
-        semester = ["F", "S", "U"]
+    if 'Fall' in semester_text:
+        semester.append('F')
+    if 'Spring' in semester_text:
+        semester.append('S')
+    if 'Summer' in semester_text:
+        semester.append('U')
+    if 'All' in semester_text:
+        semester = ['F', 'S', 'U']
 
     return (units, semester)
 
@@ -70,32 +71,32 @@ def extract_units_semester_info(line):
 #        corequisites from an array of strings.
 # @param blocks ([string]): An array of strings containing parts of the
 #        course description and the course prerequisites (starting with
-#        "Prerequisite: " or "Prerequisites: " and corequisites
-#        (starting with "Corequisite: " or "Corequisites: ".
+#        'Prerequisite: ' or 'Prerequisites: ' and corequisites
+#        (starting with 'Corequisite: ' or 'Corequisites: '.
 # @return (desc(string), prereqs(string), coreqs(string)): Course
 #        description, course prerequisites, and course corequisites
 #        respectively.
 def extract_desc_prereqs_coreqs(blocks):
-    prereqs = ""
-    coreqs = ""
-    desc = ""
+    prereqs = ''
+    coreqs = ''
+    desc = ''
     for item in blocks:
         item = item.strip()
-        if item.startswith("Prerequisite: "):
-            prereqs = item.strip("Prerequisite: ")
-        elif item.startswith("Prerequisites: "):
-            prereqs = item.strip("Prerequisites: ")
-        elif item.startswith("Corequisite: "):
-            coreqs = item.strip("Corequisite: ")
-        elif item.startswith("Corequisites: "):
-            coreqs = item.strip("Corequisite: ")
+        if item.startswith('Prerequisite: '):
+            prereqs = item.strip('Prerequisite: ')
+        elif item.startswith('Prerequisites: '):
+            prereqs = item.strip('Prerequisites: ')
+        elif item.startswith('Corequisite: '):
+            coreqs = item.strip('Corequisite: ')
+        elif item.startswith('Corequisites: '):
+            coreqs = item.strip('Corequisite: ')
         else:
-            if (desc != ""):
-                desc += " "
+            if (desc != ''):
+                desc += ' '
             desc += item
 
     # Fix odd spacing
-    desc = " ".join(desc.split())
+    desc = ' '.join(desc.split())
 
     return (desc, prereqs, coreqs)
 
@@ -112,22 +113,22 @@ def extract_desc_prereqs_coreqs(blocks):
 #          'coreqs': Course corequisites }
 def extract_course_info(dlelement):
     # Get course number and title
-    (num, name) = extract_num_name(dlelement.find("dt", class_="keepwithnext"))
+    (num, name) = extract_num_name(dlelement.find('dt', class_='keepwithnext'))
 
-    desc_block = dlelement.find("dd")
+    desc_block = dlelement.find('dd')
 
     # Remove html elements
-    for item in desc_block.find_all(re.compile("^(?!br).*$")):
+    for item in desc_block.find_all(re.compile('^(?!br).*$')):
         item.replace_with(item.get_text())
     block_raw = desc_block.decode(formatter=None)
-    block_raw = block_raw.replace("<dd>", "").replace("</dd>", "")
-    blocks = re.split("<br>|<br/>", block_raw)
+    block_raw = block_raw.replace('<dd>', '').replace('</dd>', '')
+    blocks = re.split('<br>|<br/>', block_raw)
 
     # Get units and semester info
     if len(blocks[0]) < 100:
         (units, semester) = extract_units_semester_info(blocks.pop(0))
     else:
-        (units, semester) = (0.0, ["F", "S", "U"])
+        (units, semester) = (0.0, ['F', 'S', 'U'])
 
     # Get description
     (desc, prereqs, coreqs) = extract_desc_prereqs_coreqs(blocks)
@@ -141,7 +142,7 @@ def extract_course_info(dlelement):
 # @param page: Page object to get blocks from.
 # @return: Array of course objects found on page.
 def extract_courses(page):
-    return page("dl", class_="courseblock")
+    return page('dl', class_='courseblock')
 
 
 # @function get_page
@@ -170,16 +171,16 @@ def parse_descs(inpath, outpath):
 
     # Get information
     with open(inpath, 'r') as infile:
-        print("Getting data from:")
+        print('Getting data from:')
 
         # Read links from file
         for line in infile:
-            print("    " + line.strip() + ": ", end="", flush=True)
+            print('    ' + line.strip() + ': ', end='', flush=True)
 
             # Get data
             page = get_page(line.strip())
             if not page:
-                print("Failed!")
+                print('Failed!')
                 continue
 
             # Separate out course elements
@@ -189,20 +190,20 @@ def parse_descs(inpath, outpath):
             for course in courses:
                 results.append(extract_course_info(course))
 
-            print("Success!")
+            print('Success!')
 
-    print("Writing output to file " + sys.argv[2] + "...")
+    print('Writing output to file ' + sys.argv[2] + '...')
 
     # Write to output file
     with open(outpath, 'w') as outfile:
         json.dump(results, outfile)
 
-    print("Done!")
+    print('Done!')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Verify arguments
     if len(sys.argv) != 3:
-        print("Usage: parseDescs.py [INFILE] [OUTFILE]")
+        print('Usage: parseDescs.py [INFILE] [OUTFILE]')
         sys.exit()
 
     parse_descs(sys.argv[1], sys.argv[2])
