@@ -221,13 +221,6 @@ def parseRow(row):
     print "Failed to parse row: %s; %s" %(row, e)
     return (None, {})
 
-# here lies variables preloaded into memory for debugging purposes
-#page = getPage("S")
-#fixKnownErrors(page)
-#trs = getTableRows(page)
-#def p(i):
-#  return parseRow(processRow(trs[i]))
-
 def parseDataForQuarter(quarter):
     # get the HTML page, fix its errors, and find its table rows
     print "Requesting the HTML page from the network..."
@@ -279,10 +272,10 @@ if __name__ == "__main__":
   if len(sys.argv) != 3:
     print "Usage: parseSchedules [QUARTER] [OUTFILE]"
     sys.exit()
-    
+
   # parse data
   data = parseDataForQuarter(sys.argv[1])
-  
+
   # write to output file
   print "Writing to output file..."
   try:
