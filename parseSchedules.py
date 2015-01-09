@@ -262,6 +262,10 @@ def parseDataForQuarter(quarter):
                 currLecture["sections"].append(rowData)
             # else, it's another meeting time for an existing section
             else:
+                # sometimes the instructor won't be filled in
+                if not rowData["instructor"]:
+                    rowData["instructor"] = \
+                            currSection["meetings"][-1]["instructor"]
                 currSection["meetings"].append(rowData)
         else:
             raise Exception("Unexpected kind: %s", kind)
