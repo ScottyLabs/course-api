@@ -56,7 +56,7 @@ def getPage(quarter):
   # obtain and return data
   try:
     response = urlopen(url)
-  except (urllib2.request.URLError, ValueError):
+  except:
     return None
 
   return bs4.BeautifulSoup(response.read())
