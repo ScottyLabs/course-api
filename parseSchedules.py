@@ -157,8 +157,6 @@ def parseRow(row):
   ("section", { letter: "N", days: ["M"], ...})
   (None, {})
   '''
-  # TODO: change format and code to support multiple meetings for sections
-
   # local helper functions
   def parseLecture(lectureData):
     '''
@@ -224,14 +222,72 @@ def parseRow(row):
     return (None, {})
 
 # here lies variables preloaded into memory for debugging purposes
-page = getPage("S")
-fixKnownErrors(page)
-trs = getTableRows(page)
-def p(i):
-  return parseRow(processRow(trs[i]))
+#page = getPage("S")
+#fixKnownErrors(page)
+#trs = getTableRows(page)
+#def p(i):
+#  return parseRow(processRow(trs[i]))
 
+def parseDataForQuarter(quarter):
+    # get the HTML page, fix its errors, and find its table rows
+    print "Requesting the HTML page from the network..."
+    page = getPage(quarter)
+    if not page:
+      print "Failed to obtain the HTML document! Check your internet "+ \
+            "connection and make sure your quarter is one of S, M1, M2, or F."
+      sys.exit()
+    print "Done."
+    print "Fixing errors on page..."
+    fixKnownErrors(page)
+    print "Done."
+    print "Finding table rows on page..."
+    trs = getTableRows(page)
+    print "Done."
+    # parse each row and insert it into 'data' as appropriate
+    currCourses = None
+    currCourse = None
+    currLecture = None
+    currSection = None
+    data = []
+    print "Parsing rows..."
+    for tr in trs:
+        (kind, rowData) = parseRow(processRow(tr))
+        if kind == "department":
+            currCourses = []
+            data.append({"department":rowData, "courses":currCourses})
+        elif kind == "course":
+            currCourse = rowData
+            currLecture = rowData["lectures"][0]
+            currCourses.append(rowData)
+        elif kind == "lecture":
+            currLecture = rowData
+            currCourse["lectures"].append(rowData)
+        elif kind == "section":
+            # if a letter exists, it's a new section
+            if rowData.has_key("letter"):
+                currSection = rowData
+                currLecture["sections"].append(rowData)
+            # else, it's another meeting time for an existing section
+            else:
+                currSection["meetings"].append(rowData)
+        else:
+            raise Exception("Unexpected kind: %s", kind)
+    print "Done."
+    return data
 
-# if __name__ == "__main__":
-#   if len(sys.argv) != 3:
-#     print "Usage: parseSchedules [QUARTER] [OUTFILE]"
-#     sys.exit()
+if __name__ == "__main__":
+  if len(sys.argv) != 3:
+    print "Usage: parseSchedules [QUARTER] [OUTFILE]"
+    sys.exit()
+    
+  # parse data
+  data = parseDataForQuarter(sys.argv[1])
+  
+  # write to output file
+  print "Writing to output file..."
+  try:
+    with open(sys.argv[2], 'w') as outfile:
+      json.dump(data, outfile)
+      print "Done."
+  except:
+    print "An error occurred when writing the data to the given file."
