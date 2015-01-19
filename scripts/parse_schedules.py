@@ -337,13 +337,16 @@ if __name__ == "__main__":
     print("Usage: parse_schedules.py [QUARTER] [OUTFILE]")
     sys.exit()
 
+  # extract parameters
+  quarter = sys.argv[1]
+  outfile_name = sys.argv[2]
   # parse data
-  data = parse_data_for_quarter(sys.argv[1])
+  data = parse_data_for_quarter(quarter)
 
   # write to output file
   print("Writing to output file...")
   try:
-    with open(sys.argv[2], 'w') as outfile:
+    with open(outfile_name, 'w') as outfile:
       json.dump(data, outfile)
       print("Done.")
   except:
