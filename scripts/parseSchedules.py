@@ -194,27 +194,19 @@ def parseRow(row):
   example return values:
   ("department", "Computer Science")
   ("course", { num: 15122, title: "Principles of Imperative...", ...})
-  ("lecture", { number: "Lec 1", days: ["T", "R"], ...})
-  ("section", { letter: "N", days: ["M"], ...})
+  ("lecsec", { letter: "N", days: ["M"], ...})
+  ("meeting", { days: ["N"], begin: "03:30PM", ...})
   (None, {})
   '''
   # local helper functions
-  def parseLecture(lectureData):
-    '''
-    return a dictionary containing the values in lectureData
-    '''
-    data = parseMeeting(lectureData)
-    data["number"] = lectureData[3]
-    data["sections"] = []
-    return data
 
-  def parseSection(sectionData):
+  def parseLecSec(lecSecData):
     '''
-    return a dictionary containing the values in sectionData
+    return a dictionary containing the values in lecSecData
     '''
     data = {}
-    data["meetings"] = [parseMeeting(sectionData)]
-    data["letter"] = sectionData[3]
+    data["meetings"] = [parseMeeting(lecSecData)]
+    data["letter"] = lecSecData[3]
     return data
 
   def parseMeeting(meetingData):
@@ -247,72 +239,100 @@ def parseRow(row):
       data["num"] = row[0]
       data["title"] = row[1]
       data["units"] = row[2]
-      data["lectures"] = [parseLecture(row)]
+      data["lectures"] = [parseLecSec(row)]
       return ("course", data)
-    # case lecture (determined by some form of "Lec" in the Lec/Sec column)
-    elif row[3] and "lec" in row[3].lower():
-      return ("lecture", parseLecture(row))
-    # case section (everything else, hopefully)
+    # case lecture or section
+    elif row[3]:
+      return ("lecsec", parseLecSec(row))
+    # case meeting
     else:
-      # it's possible for a section row not to have a section letter
-      if row[3]:
-        return ("section", parseSection(row))
-      else:
-        return ("section", parseMeeting(row))
+      return ("meeting", parseMeeting(row))
   except Exception as e:
     print "Failed to parse row: %s; %s" %(row, e)
     return (None, {})
 
+def extractDataFromRow(tr, data, currState):
+  '''
+  extract the data from tr and put it in data. update currState accordingly
+  '''
+  # helper functions
+  def isLecture(letter):
+    '''
+    return whether the letter represents a lecture (as opposed to a section)
+    '''
+    print letter
+    letter = letter.lower()
+    return "lec" in letter or "w" in letter
+  
+  # parse the row into a dictionary
+  (kind, rowData) = parseRow(processRow(tr))
+  # determine whether to store the dictionary, and update currState
+  if kind == "department":
+    currState["currCourses"] = []
+    data.append({"department":rowData, "courses":currState["currCourses"]})
+  elif kind == "course":
+    currState["currCourse"] = rowData
+    # the course determines whether lectures are denoted with "lec" or letters
+    if not isLecture(rowData["lectures"][0]["letter"]):
+      currState["isLetterLecture"] = True
+    else:
+      currState["isLetterLecture"] = False
+      rowData["lectures"][0]["sections"] = []
+      currState["currLecture"] = rowData["lectures"][0]
+    currState["currLecSec"] = rowData["lectures"][0]
+    currState["currCourses"].append(rowData)
+  elif kind == "lecsec":
+    currState["currLecSec"] = rowData
+    # if course is a letter-lecture, then this is for sure another lecture
+    if currState["isLetterLecture"]:
+      currState["currCourse"]["lectures"].append(rowData)
+    # not-letter-lecture
+    else:
+      # determine if lecture or section
+      if isLecture(rowData["letter"]):
+        # since this is not a letter-lecture, sections are possible
+        rowData["sections"] = []
+        currState["currLecture"] = rowData
+        currState["currCourse"]["lectures"].append(rowData)
+      else:
+        currState["currLecture"]["sections"].append(rowData)
+  elif kind == "meeting":
+    currState["currLecSec"]["meetings"].append(rowData)
+  else:
+    raise Exception("Unexpected kind: %s", kind)
+
 def parseDataForQuarter(quarter):
-    # get the HTML page, fix its errors, and find its table rows
-    print "Requesting the HTML page from the network..."
-    page = getPage(quarter)
-    if not page:
-      print "Failed to obtain the HTML document! Check your internet "+ \
-            "connection and make sure your quarter is one of S, M1, M2, or F."
-      sys.exit()
-    print "Done."
-    print "Fixing errors on page..."
-    fixKnownErrors(page)
-    print "Done."
-    print "Finding table rows on page..."
-    trs = getTableRows(page)
-    print "Done."
-    # parse each row and insert it into 'data' as appropriate
-    currCourses = None
-    currCourse = None
-    currLecture = None
-    currSection = None
-    data = []
-    print "Parsing rows..."
-    for tr in trs:
-        (kind, rowData) = parseRow(processRow(tr))
-        if kind == "department":
-            currCourses = []
-            data.append({"department":rowData, "courses":currCourses})
-        elif kind == "course":
-            currCourse = rowData
-            currLecture = rowData["lectures"][0]
-            currCourses.append(rowData)
-        elif kind == "lecture":
-            currLecture = rowData
-            currCourse["lectures"].append(rowData)
-        elif kind == "section":
-            # if a letter exists, it's a new section
-            if rowData.has_key("letter"):
-                currSection = rowData
-                currLecture["sections"].append(rowData)
-            # else, it's another meeting time for an existing section
-            else:
-                # sometimes the instructor won't be filled in
-                if not rowData["instructor"]:
-                    rowData["instructor"] = \
-                            currSection["meetings"][-1]["instructor"]
-                currSection["meetings"].append(rowData)
-        else:
-            raise Exception("Unexpected kind: %s", kind)
-    print "Done."
-    return data
+  '''
+  given a quarter, return a Python dictionary representing the data for it
+  '''
+  # get the HTML page, fix its errors, and find its table rows
+  print "Requesting the HTML page from the network..."
+  page = getPage(quarter)
+  if not page:
+    print "Failed to obtain the HTML document! Check your internet "+ \
+          "connection and make sure your quarter is one of S, M1, M2, or F."
+    sys.exit()
+  print "Done."
+  print "Fixing errors on page..."
+  fixKnownErrors(page)
+  print "Done."
+  print "Finding table rows on page..."
+  trs = getTableRows(page)
+  print "Done."
+  # parse each row and insert it into 'data' as appropriate
+  currState = {
+    "currCourses": None, # where courses should go
+    "currCourse": None, # where lectures should go
+    "currLecSec": None, # where meetings should go
+    "currLecture": None, # where sections should go
+    "isLetterLecture": False # whether lectures are denoted by letters
+  }
+  data = []
+  print "Parsing rows..."
+  for tr in trs:
+    extractDataFromRow(tr, data, currState)
+  print "Done."
+  return data
 
 # TODO: check for quarter in ["S", "M1", "M2", "F"]
 if __name__ == "__main__":
