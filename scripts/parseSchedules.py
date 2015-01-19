@@ -219,10 +219,7 @@ def parseRow(row):
     data["end"] = meetingData[6]
     data["room"] = meetingData[7]
     data["location"] = meetingData[8]
-    # TODO: don't hardcode Instructor TBA
-    if meetingData[9] == "Instructor TBA":
-      data["instructor"] = ["Instructor TBA"]
-    elif meetingData[9]:
+    if meetingData[9]:
       data["instructor"] = [inst for inst in meetingData[9].split(", ")]
     else:
       data["instructor"] = None
