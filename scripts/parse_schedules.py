@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# TODO: switch to python 3
 #
 # parse_schedules.py
 # Andrew Benson
@@ -36,8 +35,8 @@
 # lectures themselves are denoted with something like "Lec" or "Lec 1" or "W"
 # (for a Qatar lecture). One more thing - sometimes the W section (Qatar) is put
 # first, so that has to be taken into account.
-# TODO: 48125 is broken because it's lecture is named "14"...
-#
+# TODO: 48125 is broken because its lecture is named "14"...
+
 # Letter-lectures are courses like 21-295 (Putnam Seminar) or 15-295
 # (Competition Programming and Problem Solving). These are courses without large
 # central meetings that opt instead for a division into smaller (but still
@@ -98,7 +97,7 @@ def fixKnownErrors(page):
   return a BeautifulSoup representing a fixed version of page
 
   page: a Beautiful Soup representing a malformed HTML page
-  
+
   CMU doesn't seem to know how to write HTML. I could rant more,
   but that doesn't fix the issue. Here's a list of known issues:
   - The first row following a department name lacks a starting <tr> tag
@@ -115,7 +114,7 @@ def fixKnownErrors(page):
     previous section.
     ^not fixed yet
   '''
-  # TODO: finish implement the spec
+  # TODO: finish implementing the spec
   for rowTag in getTableRows(page):
     # detect department name. if found, bundle the tds into a tr
     row = processRow(rowTag)
@@ -170,7 +169,7 @@ def fixKnownErrors(page):
       while i < 10:
         rowTag.append(page.new_tag("td"))
         i += 1
-       
+
 def processRow(rowTag):
   '''
   return rowTag as a list of HTML-tag-stripped strings
@@ -199,7 +198,6 @@ def parseRow(row):
   (None, {})
   '''
   # local helper functions
-
   def parseLecSec(lecSecData):
     '''
     return a dictionary containing the values in lecSecData
