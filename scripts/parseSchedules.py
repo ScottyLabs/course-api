@@ -274,12 +274,12 @@ def extractDataFromRow(tr, data, currState):
     data.append({"department":rowData, "courses":currState["currCourses"]})
   elif kind == "course":
     currState["currCourse"] = rowData
+    rowData["lectures"][0]["sections"] = []
     # the course determines whether lectures are denoted with "lec" or letters
     if not isLecture(rowData["lectures"][0]["letter"], True):
       currState["isLetterLecture"] = True
     else:
       currState["isLetterLecture"] = False
-      rowData["lectures"][0]["sections"] = []
       currState["currLecture"] = rowData["lectures"][0]
     currState["currLecSec"] = rowData["lectures"][0]
     currState["currCourses"].append(rowData)
@@ -287,6 +287,7 @@ def extractDataFromRow(tr, data, currState):
     currState["currLecSec"] = rowData
     # if course is a letter-lecture, then this is for sure another lecture
     if currState["isLetterLecture"]:
+      rowData["sections"] = []
       currState["currCourse"]["lectures"].append(rowData)
     # not-letter-lecture
     else:
