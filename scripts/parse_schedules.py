@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # TODO: switch to python 3
 #
-# parseSchedules.py
+# parse_schedules.py
 # Andrew Benson
 #
 # Parses scheduling information from the Schedule Of Classes for a
 #     given school quarter and year
 #
-# Usage: python3 parseSchedules.py [QUARTER] [OUTFILE]
+# Usage: python3 parse_schedules.py [QUARTER] [OUTFILE]
 #
 # QUARTER: The school quarter of the schedule desired
 #     (one of S/M1/M2/F)
@@ -336,7 +336,7 @@ def parseDataForQuarter(quarter):
 # TODO: check for quarter in ["S", "M1", "M2", "F"]
 if __name__ == "__main__":
   if len(sys.argv) != 3:
-    print("Usage: parseSchedules [QUARTER] [OUTFILE]")
+    print("Usage: parse_schedules.py [QUARTER] [OUTFILE]")
     sys.exit()
 
   # parse data
