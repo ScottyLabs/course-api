@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # TODO: switch to python 3
 #
 # parseSchedules.py
@@ -7,7 +7,7 @@
 # Parses scheduling information from the Schedule Of Classes for a
 #     given school quarter and year
 #
-# Usage: python parseSchedules.py [QUARTER] [OUTFILE]
+# Usage: python3 parseSchedules.py [QUARTER] [OUTFILE]
 #
 # QUARTER: The school quarter of the schedule desired
 #     (one of S/M1/M2/F)
@@ -46,7 +46,7 @@
 # meant for only certain majors, like advanced physics courses, have only one
 # lettered lecture and comprise much of this category of courses.
 
-from urllib2 import urlopen
+import urllib.request
 import bs4
 import json
 import sys
@@ -77,7 +77,7 @@ def getPage(quarter):
 
   # obtain and return data
   try:
-    response = urlopen(url)
+    response = urllib.request.urlopen(url)
   except:
     return None
 
@@ -248,7 +248,7 @@ def parseRow(row):
     else:
       return ("meeting", parseMeeting(row))
   except Exception as e:
-    print "Failed to parse row: %s; %s" %(row, e)
+    print("Failed to parse row: %s; %s" %(row, e))
     return (None, {})
 
 def extractDataFromRow(tr, data, currState):
@@ -308,19 +308,19 @@ def parseDataForQuarter(quarter):
   given a quarter, return a Python dictionary representing the data for it
   '''
   # get the HTML page, fix its errors, and find its table rows
-  print "Requesting the HTML page from the network..."
+  print("Requesting the HTML page from the network...")
   page = getPage(quarter)
   if not page:
-    print "Failed to obtain the HTML document! Check your internet "+ \
-          "connection and make sure your quarter is one of S, M1, M2, or F."
+    print("Failed to obtain the HTML document! Check your internet "+ \
+          "connection and make sure your quarter is one of S, M1, M2, or F.")
     sys.exit()
-  print "Done."
-  print "Fixing errors on page..."
+  print("Done.")
+  print("Fixing errors on page...")
   fixKnownErrors(page)
-  print "Done."
-  print "Finding table rows on page..."
+  print("Done.")
+  print("Finding table rows on page...")
   trs = getTableRows(page)
-  print "Done."
+  print("Done.")
   # parse each row and insert it into 'data' as appropriate
   currState = {
     "currCourses": None, # where courses should go
@@ -330,26 +330,26 @@ def parseDataForQuarter(quarter):
     "isLetterLecture": False # whether lectures are denoted by letters
   }
   data = []
-  print "Parsing rows..."
+  print("Parsing rows...")
   for tr in trs:
     extractDataFromRow(tr, data, currState)
-  print "Done."
+  print("Done.")
   return data
 
 # TODO: check for quarter in ["S", "M1", "M2", "F"]
 if __name__ == "__main__":
   if len(sys.argv) != 3:
-    print "Usage: parseSchedules [QUARTER] [OUTFILE]"
+    print("Usage: parseSchedules [QUARTER] [OUTFILE]")
     sys.exit()
 
   # parse data
   data = parseDataForQuarter(sys.argv[1])
 
   # write to output file
-  print "Writing to output file..."
+  print("Writing to output file...")
   try:
     with open(sys.argv[2], 'w') as outfile:
       json.dump(data, outfile)
-      print "Done."
+      print("Done.")
   except:
-    print "An error occurred when writing the data to the given file."
+    print("An error occurred when writing the data to the given file.")
