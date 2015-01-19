@@ -50,13 +50,13 @@ import bs4
 import json
 import sys
 
-def getPage(quarter):
+def get_page(quarter):
   '''
   return a BeautifulSoup that represents the HTML page specified by quarter
 
   quarter: one of ["S", "M1", "M2", "F"]
 
-  if getPage fails, None will be returned
+  if get_page fails, None will be returned
   '''
   # error checking
   quarter = quarter.upper()
@@ -82,7 +82,7 @@ def getPage(quarter):
 
   return bs4.BeautifulSoup(response.read())
 
-def getTableRows(page):
+def get_table_rows(page):
   '''
   return a list of relevant <tr> bs4 Tags
 
@@ -92,7 +92,7 @@ def getTableRows(page):
   # the second row is the header row (Course, Title, Units, etc.)
   return page.find_all("tr")[2:]
 
-def fixKnownErrors(page):
+def fix_known_errors(page):
   '''
   return a BeautifulSoup representing a fixed version of page
 
@@ -115,28 +115,28 @@ def fixKnownErrors(page):
     ^not fixed yet
   '''
   # TODO: finish implementing the spec
-  for rowTag in getTableRows(page):
+  for row_tag in get_table_rows(page):
     # detect department name. if found, bundle the tds into a tr
-    row = processRow(rowTag)
+    row = process_row(row_tag)
     if row[0] and not row[0].isdigit():
       tds = []
-      lastNot = rowTag
+      last_not = row_tag
       # find all tds up to next non-td
       while True:
         # sometimes we hit the end of the document due to corrupted bs4 parsing
-        if not lastNot.next_sibling:
+        if not last_not.next_sibling:
           break
         # idk why there are newlines, but we ignore them
-        elif lastNot.next_sibling == "\n":
-          lastNot = lastNot.next_sibling
+        elif last_not.next_sibling == "\n":
+          last_not = last_not.next_sibling
           continue
         # just in case we don't hit corrupted bs4 parsing after all
-        elif lastNot.next_sibling.name != "td":
+        elif last_not.next_sibling.name != "td":
           break
         # extract removes it from the document, and it acts like a doubly-linked
         # list, so it patches the next_sibling pointers for us
         else:
-          tds.append(lastNot.next_sibling.extract())
+          tds.append(last_not.next_sibling.extract())
       # make a new tr tag, add in the tds
       tr = page.new_tag("tr")
       counter = 0
@@ -148,43 +148,43 @@ def fixKnownErrors(page):
         tr.append(page.new_tag("td"))
         counter += 1
       # paste it back in
-      rowTag.insert_after(tr)
+      row_tag.insert_after(tr)
     # detect a row with a course number, title, and credits, but nothing else
     elif all(row[:3]) and not any(row[3:]):
       # extract course number and credits, and move to following row. then
       # delete this orphan row
-      courseNum = row[0]
-      courseCredits = row[2]
-      nextRow = rowTag
+      course_num = row[0]
+      course_credits = row[2]
+      next_row = row_tag
       while True:
-        nextRow = nextRow.next_sibling
-        if nextRow != "\n":
+        next_row = next_row.next_sibling
+        if next_row != "\n":
           break
-      nextRow.contents[0].string = courseNum
-      nextRow.contents[2].string = courseCredits
-      rowTag.extract()
+      next_row.contents[0].string = course_num
+      next_row.contents[2].string = course_credits
+      row_tag.extract()
     else:
       # ensure that the new row has 10 columns
       i = len(row)
       while i < 10:
-        rowTag.append(page.new_tag("td"))
+        row_tag.append(page.new_tag("td"))
         i += 1
 
-def processRow(rowTag):
+def process_row(row_tag):
   '''
-  return rowTag as a list of HTML-tag-stripped strings
+  return row_tag as a list of HTML-tag-stripped strings
 
-  rowTag: a <tr> bs4 Tag, where each column contains exactly one string
+  row_tag: a <tr> bs4 Tag, where each column contains exactly one string
   '''
   res = []
-  for tag in rowTag.children:
+  for tag in row_tag.children:
     if not tag.string or tag.string.isspace():
       res.append(None)
     else:
       res.append(tag.string)
   return res
 
-def parseRow(row):
+def parse_row(row):
   '''
   return (kind, data) where kind represents the kind of data returned
 
@@ -198,27 +198,27 @@ def parseRow(row):
   (None, {})
   '''
   # local helper functions
-  def parseLecSec(lecSecData):
+  def parse_lec_sec(lec_sec_data):
     '''
-    return a dictionary containing the values in lecSecData
+    return a dictionary containing the values in lec_sec_data
     '''
     data = {}
-    data["meetings"] = [parseMeeting(lecSecData)]
-    data["letter"] = lecSecData[3]
+    data["meetings"] = [parse_meeting(lec_sec_data)]
+    data["letter"] = lec_sec_data[3]
     return data
 
-  def parseMeeting(meetingData):
+  def parse_meeting(meeting_data):
     '''
-    return a dictionary containing the values in meetingData
+    return a dictionary containing the values in meeting_data
     '''
     data = {}
-    data["days"] = meetingData[4]
-    data["begin"] = meetingData[5]
-    data["end"] = meetingData[6]
-    data["room"] = meetingData[7]
-    data["location"] = meetingData[8]
-    if meetingData[9]:
-      data["instructor"] = [inst for inst in meetingData[9].split(", ")]
+    data["days"] = meeting_data[4]
+    data["begin"] = meeting_data[5]
+    data["end"] = meeting_data[6]
+    data["room"] = meeting_data[7]
+    data["location"] = meeting_data[8]
+    if meeting_data[9]:
+      data["instructor"] = [inst for inst in meeting_data[9].split(", ")]
     else:
       data["instructor"] = None
     return data
@@ -234,100 +234,100 @@ def parseRow(row):
       data["num"] = row[0]
       data["title"] = row[1]
       data["units"] = row[2]
-      data["lectures"] = [parseLecSec(row)]
+      data["lectures"] = [parse_lec_sec(row)]
       return ("course", data)
     # case lecture or section
     elif row[3]:
-      return ("lecsec", parseLecSec(row))
+      return ("lecsec", parse_lec_sec(row))
     # case meeting
     else:
-      return ("meeting", parseMeeting(row))
+      return ("meeting", parse_meeting(row))
   except Exception as e:
     print("Failed to parse row: %s; %s" %(row, e))
     return (None, {})
 
-def extractDataFromRow(tr, data, currState):
+def extract_data_from_row(tr, data, curr_state):
   '''
-  extract the data from tr and put it in data. update currState accordingly
+  extract the data from tr and put it in data. update curr_state accordingly
   '''
   # helper functions
-  def isLecture(letter, isFirstLine):
+  def is_lecture(letter, is_first_line):
     '''
     return whether the letter represents a lecture (as opposed to a section)
     '''
     letter = letter.lower()
-    if isFirstLine: # W can be a lecture, but only if it's on the first line
+    if is_first_line: # W can be a lecture, but only if it's on the first line
       return "lec" in letter or "w" in letter
     else:
       return "lec" in letter
   
   # parse the row into a dictionary
-  (kind, rowData) = parseRow(processRow(tr))
-  # determine whether to store the dictionary, and update currState
+  (kind, row_data) = parse_row(process_row(tr))
+  # determine whether to store the dictionary, and update curr_state
   if kind == "department":
-    currState["currCourses"] = []
-    data.append({"department":rowData, "courses":currState["currCourses"]})
+    curr_state["curr_courses"] = []
+    data.append({"department":row_data, "courses":curr_state["curr_courses"]})
   elif kind == "course":
-    currState["currCourse"] = rowData
-    rowData["lectures"][0]["sections"] = []
+    curr_state["curr_course"] = row_data
+    row_data["lectures"][0]["sections"] = []
     # the course determines whether lectures are denoted with "lec" or letters
-    if not isLecture(rowData["lectures"][0]["letter"], True):
-      currState["isLetterLecture"] = True
+    if not is_lecture(row_data["lectures"][0]["letter"], True):
+      curr_state["is_letter_lecture"] = True
     else:
-      currState["isLetterLecture"] = False
-      currState["currLecture"] = rowData["lectures"][0]
-    currState["currLecSec"] = rowData["lectures"][0]
-    currState["currCourses"].append(rowData)
+      curr_state["is_letter_lecture"] = False
+      curr_state["curr_lecture"] = row_data["lectures"][0]
+    curr_state["curr_lec_sec"] = row_data["lectures"][0]
+    curr_state["curr_courses"].append(row_data)
   elif kind == "lecsec":
-    currState["currLecSec"] = rowData
+    curr_state["curr_lec_sec"] = row_data
     # if course is a letter-lecture, then this is for sure another lecture
-    if currState["isLetterLecture"]:
-      rowData["sections"] = []
-      currState["currCourse"]["lectures"].append(rowData)
+    if curr_state["is_letter_lecture"]:
+      row_data["sections"] = []
+      curr_state["curr_course"]["lectures"].append(row_data)
     # not-letter-lecture
     else:
       # determine if lecture or section
-      if isLecture(rowData["letter"], False):
-        rowData["sections"] = []
-        currState["currLecture"] = rowData
-        currState["currCourse"]["lectures"].append(rowData)
+      if is_lecture(row_data["letter"], False):
+        row_data["sections"] = []
+        curr_state["curr_lecture"] = row_data
+        curr_state["curr_course"]["lectures"].append(row_data)
       else:
-        currState["currLecture"]["sections"].append(rowData)
+        curr_state["curr_lecture"]["sections"].append(row_data)
   elif kind == "meeting":
-    currState["currLecSec"]["meetings"].append(rowData)
+    curr_state["curr_lec_sec"]["meetings"].append(row_data)
   else:
     raise Exception("Unexpected kind: %s", kind)
 
-def parseDataForQuarter(quarter):
+def parse_data_for_quarter(quarter):
   '''
   given a quarter, return a Python dictionary representing the data for it
   '''
   # get the HTML page, fix its errors, and find its table rows
   print("Requesting the HTML page from the network...")
-  page = getPage(quarter)
+  page = get_page(quarter)
   if not page:
     print("Failed to obtain the HTML document! Check your internet "+ \
           "connection and make sure your quarter is one of S, M1, M2, or F.")
     sys.exit()
   print("Done.")
   print("Fixing errors on page...")
-  fixKnownErrors(page)
+  fix_known_errors(page)
   print("Done.")
   print("Finding table rows on page...")
-  trs = getTableRows(page)
+  trs = get_table_rows(page)
   print("Done.")
   # parse each row and insert it into 'data' as appropriate
-  currState = {
-    "currCourses": None, # where courses should go
-    "currCourse": None, # where lectures should go
-    "currLecSec": None, # where meetings should go
-    "currLecture": None, # where sections should go
-    "isLetterLecture": False # whether lectures are denoted by letters
+  curr_state = {
+    "curr_courses": None, # where courses should go
+    "curr_course": None, # where lectures should go
+    "curr_lec_sec": None, # where meetings should go
+    "curr_lecture": None, # where sections should go
+    "is_letter_lecture": False # whether lectures are denoted by letters
   }
   data = []
   print("Parsing rows...")
   for tr in trs:
-    extractDataFromRow(tr, data, currState)
+    extract_data_from_row(tr, data, curr_state)
   print("Done.")
   return data
 
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     sys.exit()
 
   # parse data
-  data = parseDataForQuarter(sys.argv[1])
+  data = parse_data_for_quarter(sys.argv[1])
 
   # write to output file
   print("Writing to output file...")
