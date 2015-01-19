@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# TODO: switch to python 3
 #
 # parseSchedules.py
 # Andrew Benson
@@ -23,6 +24,27 @@
 # 7: BUILDING/ROOM i.e. "DH 2210"
 # 8: LOCATION i.e. "Pittsburgh, Pennsylvania"
 # 9: INSTRUCTOR i.e. "Simmons, Wright"
+#
+# It's hard to determine what is a lecture and what is a section/recitation.
+# After extended examination of course data and how it shows up in SIO, I have
+# found two main types of courses: letter-lectures and ... non-letter-lectures.
+#
+# Non-letter-lectures are courses like 15-122 (Principles of Imperative
+# Computation) or 80-180 (Nature of Language). The course has large central
+# meeting(s) that a large portion of the students attend (the lectures) each of
+# which are separated into sections (usually denoted with letters). The
+# lectures themselves are denoted with something like "Lec" or "Lec 1" or "W"
+# (for a Qatar lecture). One more thing - sometimes the W section (Qatar) is put
+# first, so that has to be taken into account.
+# TODO: 48125 is broken because it's lecture is named "14"...
+#
+# Letter-lectures are courses like 21-295 (Putnam Seminar) or 15-295
+# (Competition Programming and Problem Solving). These are courses without large
+# central meetings that opt instead for a division into smaller (but still
+# significant) lettered groups. Because typically each group is taught by an
+# instructor and not by a TA, I call these lettered groups "lectures". Courses
+# meant for only certain majors, like advanced physics courses, have only one
+# lettered lecture and comprise much of this category of courses.
 
 from urllib2 import urlopen
 import bs4
@@ -86,6 +108,11 @@ def fixKnownErrors(page):
   - Some rows don't even have 10 columns (i.e. they leave out the
     instructor column for no good reason). that's just annoying to parse.
   - Some rows decide to split everything into two rows JUST 'CAUSE THEY CAN.
+    To be more specific, it looks like the course title is split into two. SIO's
+    behavior appears to be just using the second line.
+  - Some rows are empty except for the course title, sometimes appended with a
+    colon. Not sure what's up with that, but it adds nonsense meetings to the
+    previous section.
     ^not fixed yet
   '''
   # TODO: finish implement the spec
@@ -186,6 +213,7 @@ def parseRow(row):
     data["end"] = meetingData[6]
     data["room"] = meetingData[7]
     data["location"] = meetingData[8]
+    # TODO: don't hardcode Instructor TBA
     if meetingData[9] == "Instructor TBA":
       data["instructor"] = ["Instructor TBA"]
     elif meetingData[9]:
@@ -202,6 +230,7 @@ def parseRow(row):
     # case course (determined by having a numeric course)
     elif row[0] and row[0].isdigit():
       data = {}
+      # TODO: this chops off the 0 in departments like 03, biology
       data["num"] = int(row[0])
       data["title"] = row[1]
       data["units"] = row[2]
@@ -272,6 +301,7 @@ def parseDataForQuarter(quarter):
     print "Done."
     return data
 
+# TODO: check for quarter in ["S", "M1", "M2", "F"]
 if __name__ == "__main__":
   if len(sys.argv) != 3:
     print "Usage: parseSchedules [QUARTER] [OUTFILE]"
