@@ -256,12 +256,15 @@ def extractDataFromRow(tr, data, currState):
   extract the data from tr and put it in data. update currState accordingly
   '''
   # helper functions
-  def isLecture(letter):
+  def isLecture(letter, isFirstLine):
     '''
     return whether the letter represents a lecture (as opposed to a section)
     '''
     letter = letter.lower()
-    return "lec" in letter or "w" in letter
+    if isFirstLine: # W can be a lecture, but only if it's on the first line
+      return "lec" in letter or "w" in letter
+    else:
+      return "lec" in letter
   
   # parse the row into a dictionary
   (kind, rowData) = parseRow(processRow(tr))
@@ -272,7 +275,7 @@ def extractDataFromRow(tr, data, currState):
   elif kind == "course":
     currState["currCourse"] = rowData
     # the course determines whether lectures are denoted with "lec" or letters
-    if not isLecture(rowData["lectures"][0]["letter"]):
+    if not isLecture(rowData["lectures"][0]["letter"], True):
       currState["isLetterLecture"] = True
     else:
       currState["isLetterLecture"] = False
@@ -288,8 +291,7 @@ def extractDataFromRow(tr, data, currState):
     # not-letter-lecture
     else:
       # determine if lecture or section
-      if isLecture(rowData["letter"]):
-        # since this is not a letter-lecture, sections are possible
+      if isLecture(rowData["letter"], False):
         rowData["sections"] = []
         currState["currLecture"] = rowData
         currState["currCourse"]["lectures"].append(rowData)
