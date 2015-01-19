@@ -230,8 +230,7 @@ def parseRow(row):
     # case course (determined by having a numeric course)
     elif row[0] and row[0].isdigit():
       data = {}
-      # TODO: this chops off the 0 in departments like 03, biology
-      data["num"] = int(row[0])
+      data["num"] = row[0]
       data["title"] = row[1]
       data["units"] = row[2]
       data["lectures"] = [parseLecture(row)]
