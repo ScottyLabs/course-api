@@ -260,7 +260,6 @@ def extractDataFromRow(tr, data, currState):
     '''
     return whether the letter represents a lecture (as opposed to a section)
     '''
-    print letter
     letter = letter.lower()
     return "lec" in letter or "w" in letter
   
