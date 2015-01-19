@@ -306,8 +306,7 @@ def parse_data_for_quarter(quarter):
   print("Requesting the HTML page from the network...")
   page = get_page(quarter)
   if not page:
-    print("Failed to obtain the HTML document! Check your internet "+ \
-          "connection and make sure your quarter is one of S, M1, M2, or F.")
+    print("Failed to obtain the HTML document! Check your internet connection.")
     sys.exit()
   print("Done.")
   print("Fixing errors on page...")
@@ -340,6 +339,12 @@ if __name__ == "__main__":
   # extract parameters
   quarter = sys.argv[1]
   outfile_name = sys.argv[2]
+  
+  # sanity quarter check
+  if quarter not in ["S", "M1", "M2", "F"]:
+    print("Requested quarter is not one of ['S', 'M1', 'M2', 'F']")
+    sys.exit()
+    
   # parse data
   data = parse_data_for_quarter(quarter)
 
