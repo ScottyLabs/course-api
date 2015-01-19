@@ -203,7 +203,7 @@ def parse_descs(inpath, outpath):
 if __name__ == '__main__':
     # Verify arguments
     if len(sys.argv) != 3:
-        print('Usage: parseDescs.py [INFILE] [OUTFILE]')
+        print('Usage: parse_descs.py [INFILE] [OUTFILE]')
         sys.exit()
 
     parse_descs(sys.argv[1], sys.argv[2])
