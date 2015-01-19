@@ -150,6 +150,20 @@ def fixKnownErrors(page):
         counter += 1
       # paste it back in
       rowTag.insert_after(tr)
+    # detect a row with a course number, title, and credits, but nothing else
+    elif all(row[:3]) and not any(row[3:]):
+      # extract course number and credits, and move to following row. then
+      # delete this orphan row
+      courseNum = row[0]
+      courseCredits = row[2]
+      nextRow = rowTag
+      while True:
+        nextRow = nextRow.next_sibling
+        if nextRow != "\n":
+          break
+      nextRow.contents[0].string = courseNum
+      nextRow.contents[2].string = courseCredits
+      rowTag.extract()
     else:
       # ensure that the new row has 10 columns
       i = len(row)
