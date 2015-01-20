@@ -205,6 +205,10 @@ def parse_row(row):
     data = {}
     data["meetings"] = [parse_meeting(lec_sec_data)]
     data["letter"] = lec_sec_data[3]
+    if lec_sec_data[9]:
+      data["instructor"] = [inst for inst in lec_sec_data[9].split(", ")]
+    else:
+      data["instructor"] = None
     return data
 
   def parse_meeting(meeting_data):
@@ -217,10 +221,6 @@ def parse_row(row):
     data["end"] = meeting_data[6]
     data["room"] = meeting_data[7]
     data["location"] = meeting_data[8]
-    if meeting_data[9]:
-      data["instructor"] = [inst for inst in meeting_data[9].split(", ")]
-    else:
-      data["instructor"] = None
     return data
 
   # the data can be very irregular, so we wrap with try-except
