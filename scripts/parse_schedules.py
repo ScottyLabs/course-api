@@ -112,8 +112,6 @@ def fix_known_errors(page):
     colon. Not sure what's up with that, but it adds nonsense meetings to the
     previous section.
   """
-    ^not fixed yet
-  # TODO: finish implementing the spec
   for row_tag in get_table_rows(page):
     # detect department name. if found, bundle the tds into a tr
     row = process_row(row_tag)
@@ -161,6 +159,9 @@ def fix_known_errors(page):
           break
       next_row.contents[0].string = course_num
       next_row.contents[2].string = course_credits
+      row_tag.extract()
+    # detect a row that's empty except for possibly the course title. delete.
+    elif not row[0] and row[1] and not any(row[2:]):
       row_tag.extract()
     else:
       # ensure that the new row has 10 columns
