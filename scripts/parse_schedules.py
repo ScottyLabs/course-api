@@ -256,8 +256,10 @@ def extract_data_from_row(tr, data, curr_state):
     return whether the letter represents a lecture (as opposed to a section)
     """
     letter = letter.lower()
-    if is_first_line: # W can be a lecture, but only if it's on the first line
-      return "lec" in letter or "w" in letter
+    if is_first_line:
+      # W can be a lecture, but only if it's on the first line
+      # weirdly enough, lectures can sometimes be simple numbers
+      return "lec" in letter or "w" in letter or letter.isdigit()
     else:
       return "lec" in letter
   
