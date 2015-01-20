@@ -80,7 +80,7 @@ $ python3 scripts/parse_schedules.py [QUARTER] [OUTFILE]
 
 ### Output format
 
-Beware that any field below may have null or "TBA" instead of a string as a value.
+Beware that any field below may have `null` or "TBA" instead of the expected string as a value.
 
 Scraped data consists of a list of departments. A department has the form:
 
