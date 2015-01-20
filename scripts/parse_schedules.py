@@ -206,9 +206,9 @@ def parse_row(row):
     data["meetings"] = [parse_meeting(lec_sec_data)]
     data["letter"] = lec_sec_data[3]
     if lec_sec_data[9]:
-      data["instructor"] = [inst for inst in lec_sec_data[9].split(", ")]
+      data["instructors"] = [inst for inst in lec_sec_data[9].split(", ")]
     else:
-      data["instructor"] = None
+      data["instructors"] = None
     return data
 
   def parse_meeting(meeting_data):
