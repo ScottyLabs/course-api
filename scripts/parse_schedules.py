@@ -1,49 +1,48 @@
 #!/usr/bin/env python3
-#
-# parse_schedules.py
-# Andrew Benson
-#
-# Parses scheduling information from the Schedule Of Classes for a
-#     given school quarter and year
-#
-# Usage: python3 parse_schedules.py [QUARTER] [OUTFILE]
-#
-# QUARTER: The school quarter of the schedule desired
-#     (one of S/M1/M2/F)
-# OUTFILE: An file where resulting JSON will be written
+"""
+parse_schedules.py
+Andrew Benson
 
-# for reference, here is what each column number refers to in the raw HTML
-# 0: COURSE i.e. "15122"
-# 1: TITLE i.e. "Principles of Imperative Computation"
-# 2: UNITS i.e. "10.0"
-# 3: LEC/SEC i.e. "Lec 1", "M"
-# 4: DAYS i.e. "TR"
-# 5: BEGIN i.e. "09:00AM"
-# 6: END i.e. "10:20AM"
-# 7: BUILDING/ROOM i.e. "DH 2210"
-# 8: LOCATION i.e. "Pittsburgh, Pennsylvania"
-# 9: INSTRUCTOR i.e. "Simmons, Wright"
-#
-# It's hard to determine what is a lecture and what is a section/recitation.
-# After extended examination of course data and how it shows up in SIO, I have
-# found two main types of courses: letter-lectures and ... non-letter-lectures.
-#
-# Non-letter-lectures are courses like 15-122 (Principles of Imperative
-# Computation) or 80-180 (Nature of Language). The course has large central
-# meeting(s) that a large portion of the students attend (the lectures) each of
-# which are separated into sections (usually denoted with letters). The
-# lectures themselves are denoted with something like "Lec" or "Lec 1" or "W"
-# (for a Qatar lecture). One more thing - sometimes the W section (Qatar) is put
-# first, so that has to be taken into account.
-# TODO: 48125 is broken because its lecture is named "14"...
+Parses scheduling information from the Schedule Of Classes for a
+    given school quarter and year
 
-# Letter-lectures are courses like 21-295 (Putnam Seminar) or 15-295
-# (Competition Programming and Problem Solving). These are courses without large
-# central meetings that opt instead for a division into smaller (but still
-# significant) lettered groups. Because typically each group is taught by an
-# instructor and not by a TA, I call these lettered groups "lectures". Courses
-# meant for only certain majors, like advanced physics courses, have only one
-# lettered lecture and comprise much of this category of courses.
+Usage: python3 parse_schedules.py [QUARTER] [OUTFILE]
+
+QUARTER: The school quarter of the schedule desired
+    (one of S/M1/M2/F)
+OUTFILE: An file where resulting JSON will be written
+
+for reference, here is what each column number refers to in the raw HTML
+0: COURSE i.e. "15122"
+1: TITLE i.e. "Principles of Imperative Computation"
+2: UNITS i.e. "10.0"
+3: LEC/SEC i.e. "Lec 1", "M"
+4: DAYS i.e. "TR"
+5: BEGIN i.e. "09:00AM"
+6: END i.e. "10:20AM"
+7: BUILDING/ROOM i.e. "DH 2210"
+8: LOCATION i.e. "Pittsburgh, Pennsylvania"
+9: INSTRUCTOR i.e. "Simmons, Wright"
+
+It's hard to determine what is a lecture and what is a section/recitation.
+After extended examination of course data and how it shows up in SIO, I have
+found two main types of courses: letter-lectures and ... non-letter-lectures.
+
+Non-letter-lectures are courses like 15-122 (Principles of Imperative
+Computation) or 80-180 (Nature of Language). The course has large central
+meeting(s) that a large portion of the students attend (the lectures) each of
+which are separated into sections (usually denoted with letters). The
+lectures themselves are denoted with something like "Lec" or "Lec 1" or "W"
+(for a Qatar lecture). Sometimes they are even denoted with numbers.
+
+Letter-lectures are courses like 21-295 (Putnam Seminar) or 15-295
+(Competition Programming and Problem Solving). These are courses without large
+central meetings that opt instead for a division into smaller (but still
+significant) lettered groups. Because typically each group is taught by an
+instructor and not by a TA, I call these lettered groups "lectures". Courses
+meant for only certain majors, like advanced physics courses, have only one
+lettered lecture and comprise much of this category of courses.
+"""
 
 import urllib.request
 import bs4
@@ -51,13 +50,13 @@ import json
 import sys
 
 def get_page(quarter):
-  '''
+  """
   return a BeautifulSoup that represents the HTML page specified by quarter
 
   quarter: one of ["S", "M1", "M2", "F"]
 
   if get_page fails, None will be returned
-  '''
+  """
   # error checking
   quarter = quarter.upper()
   if quarter not in ["S", "M1", "M2", "F"]:
@@ -83,17 +82,17 @@ def get_page(quarter):
   return bs4.BeautifulSoup(response.read())
 
 def get_table_rows(page):
-  '''
+  """
   return a list of relevant <tr> bs4 Tags
 
   page: a BeautifulSoup with a <table> with interesting rows
-  '''
+  """
   # the first row is a weird empty row
   # the second row is the header row (Course, Title, Units, etc.)
   return page.find_all("tr")[2:]
 
 def fix_known_errors(page):
-  '''
+  """
   return a BeautifulSoup representing a fixed version of page
 
   page: a Beautiful Soup representing a malformed HTML page
@@ -112,8 +111,8 @@ def fix_known_errors(page):
   - Some rows are empty except for the course title, sometimes appended with a
     colon. Not sure what's up with that, but it adds nonsense meetings to the
     previous section.
+  """
     ^not fixed yet
-  '''
   # TODO: finish implementing the spec
   for row_tag in get_table_rows(page):
     # detect department name. if found, bundle the tds into a tr
@@ -171,11 +170,11 @@ def fix_known_errors(page):
         i += 1
 
 def process_row(row_tag):
-  '''
+  """
   return row_tag as a list of HTML-tag-stripped strings
 
   row_tag: a <tr> bs4 Tag, where each column contains exactly one string
-  '''
+  """
   res = []
   for tag in row_tag.children:
     if not tag.string or tag.string.isspace():
@@ -185,7 +184,7 @@ def process_row(row_tag):
   return res
 
 def parse_row(row):
-  '''
+  """
   return (kind, data) where kind represents the kind of data returned
 
   row: list of HTML-tag-stripped strings that represent a data table row
@@ -196,21 +195,21 @@ def parse_row(row):
   ("lecsec", { letter: "N", days: ["M"], ...})
   ("meeting", { days: ["N"], begin: "03:30PM", ...})
   (None, {})
-  '''
+  """
   # local helper functions
   def parse_lec_sec(lec_sec_data):
-    '''
+    """
     return a dictionary containing the values in lec_sec_data
-    '''
+    """
     data = {}
     data["meetings"] = [parse_meeting(lec_sec_data)]
     data["letter"] = lec_sec_data[3]
     return data
 
   def parse_meeting(meeting_data):
-    '''
+    """
     return a dictionary containing the values in meeting_data
-    '''
+    """
     data = {}
     data["days"] = meeting_data[4]
     data["begin"] = meeting_data[5]
@@ -247,14 +246,14 @@ def parse_row(row):
     return (None, {})
 
 def extract_data_from_row(tr, data, curr_state):
-  '''
+  """
   extract the data from tr and put it in data. update curr_state accordingly
-  '''
+  """
   # helper functions
   def is_lecture(letter, is_first_line):
-    '''
+    """
     return whether the letter represents a lecture (as opposed to a section)
-    '''
+    """
     letter = letter.lower()
     if is_first_line: # W can be a lecture, but only if it's on the first line
       return "lec" in letter or "w" in letter
@@ -299,9 +298,9 @@ def extract_data_from_row(tr, data, curr_state):
     raise Exception("Unexpected kind: %s", kind)
 
 def parse_data_for_quarter(quarter):
-  '''
+  """
   given a quarter, return a Python dictionary representing the data for it
-  '''
+  """
   # get the HTML page, fix its errors, and find its table rows
   print("Requesting the HTML page from the network...")
   page = get_page(quarter)
@@ -330,7 +329,6 @@ def parse_data_for_quarter(quarter):
   print("Done.")
   return data
 
-# TODO: check for quarter in ["S", "M1", "M2", "F"]
 if __name__ == "__main__":
   if len(sys.argv) != 3:
     print("Usage: parse_schedules.py [QUARTER] [OUTFILE]")
