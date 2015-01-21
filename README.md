@@ -59,3 +59,148 @@ By default, this data is stored minified in the output file. To get human readab
 ```
 python -m json.tool out.json
 ```
+
+## scripts/parse_schedules.py
+
+This script is used to get scheduling data from https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/completeSchedule pages.
+
+### Setup
+
+Exactly the same as `scripts/parse_descs.py`.
+
+### Usage
+
+```
+$ python3 scripts/parse_schedules.py [QUARTER] [OUTFILE]
+```
+
+`QUARTER` is the school quarter for which you wish to retrieve scheduling data. It must be one of S, M1, M2, or F.
+
+`OUTFILE` is a path to write the output JSON to.
+
+### Output format
+
+Beware that any field below may have `null` or "TBA" instead of the expected string as a value.
+
+Scraped data consists of a list of departments. A department has the form:
+
+```
+[
+    ...,
+    {
+        "courses": [
+            ...,
+            <course object>,
+            ...
+        ],
+        "deparment": "Computer Science"
+    },
+    ...
+]
+```
+
+Field      | Type     | Description
+-----------|----------|------------
+courses    | [course] | List of courses in the department. See below for description of a course object.
+department | String   | Department name
+
+A course has the form:
+
+```
+{
+    "lectures": [
+        ...,
+        <lecture object>,
+        ...
+    ],
+    "num": "15122",
+    "title": "Principles of Imperative Computation",
+    "units": "10.0"
+}
+```
+
+Field    | Type      | Description
+---------|-----------|------------
+lectures | [lecture] | List of lectures in the course. See below for description of a lecture object.
+num      | String    | Course number (without dash)
+title    | String    | Course name
+units    | String    | Units awarded by course. Note that this isn't limited to floats - it could be a range, or VAR.
+
+A lecture has the form:
+
+```
+{
+    "instructors": [
+        "Kosbie",
+        "Andersen"
+    ],
+    "lecture": "Lec 1",
+    "meetings": [
+        ...,
+        <meeting object>,
+        ...
+    ],
+    "sections": [
+        ...,
+        <section object>,
+        ...
+    ]
+}
+```
+
+Field       | Type      | Description
+------------|-----------|------------
+instructors | [String]  | List of last names of instructors of the lecture.
+lecture     | String    | The lecture's identifier. Typically a capital letter or something like "Lec 1".
+meetings    | [meeting] | List of meetings for the lecture. See below for description of a meeting object.
+sections    | [section] | List of sections for the lecture. See below for description of a section object.
+
+A section has the form:
+
+```
+{
+    "instructors": [
+        "Simmons"
+    ],
+    "meetings": [
+        ...,
+        <meeting object>,
+        ...
+    ],
+    "section": "N"
+}
+```
+
+Field       | Type      | Description
+------------|-----------|------------
+instructors | [String]  | List of last names of instructors of the section.
+meetings    | [meeting] | List of meetings for the section. See below for description of a meeting object.
+section     | String    | The section's identifier. Almost always a capital letter.
+
+A meeting has the form:
+
+```
+{
+    "begin": "03:30PM",
+    "days": "F",
+    "end": "04:20PM",
+    "location": "Pittsburgh, Pennsylvania",
+    "room": "PH 226B"
+}
+```
+
+Field    | Type   | Description
+---------|--------|------------
+begin    | String | The time at which the lecture or section begins.
+days     | String | The days the lecture or section meets at this time, abbreviated and concatenated.
+end      | String | The time at which the lecture or section ends.
+location | String | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
+room     | String | The building and/or room in which the lecture or section meets.
+
+Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively.
+
+By default, this data is stored minified in the output file. To get human readable JSON, use the command (for output file `out.json`):
+
+```
+python -m json.tool out.json
+```
