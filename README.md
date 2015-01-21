@@ -134,7 +134,7 @@ A lecture has the form:
         "Kosbie",
         "Andersen"
     ],
-    "letter": "Lec 1",
+    "lecture": "Lec 1",
     "meetings": [
         ...,
         <meeting object>,
@@ -151,7 +151,7 @@ A lecture has the form:
 Field       | Type      | Description
 ------------|-----------|------------
 instructors | [String]  | List of last names of instructors of the lecture.
-letter      | String    | The lecture's identifier. Typically a capital letter or something like "Lec 1".
+lecture     | String    | The lecture's identifier. Typically a capital letter or something like "Lec 1".
 meetings    | [meeting] | List of meetings for the lecture. See below for description of a meeting object.
 sections    | [section] | List of sections for the lecture. See below for description of a section object.
 
@@ -162,20 +162,20 @@ A section has the form:
     "instructors": [
         "Simmons"
     ],
-    "letter": "N",
     "meetings": [
         ...,
         <meeting object>,
         ...
-    ]
+    ],
+    "section": "N"
 }
 ```
 
 Field       | Type      | Description
 ------------|-----------|------------
 instructors | [String]  | List of last names of instructors of the section.
-letter      | String    | The section's identifier. Almost always a capital letter.
 meetings    | [meeting] | List of meetings for the section. See below for description of a meeting object.
+section     | String    | The section's identifier. Almost always a capital letter.
 
 A meeting has the form:
 

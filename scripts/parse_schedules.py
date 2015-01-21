@@ -188,7 +188,7 @@ def parse_row(row):
     example return values:
     ("department", "Computer Science")
     ("course", { num: 15122, title: "Principles of Imperative...", ...})
-    ("lecsec", { letter: "N", days: ["M"], ...})
+    ("lecsec", { section: "N", days: ["M"], ...})
     ("meeting", { days: ["N"], begin: "03:30PM", ...})
     (None, {})
     """
@@ -274,12 +274,20 @@ def extract_data_from_row(tr, data, curr_state):
             curr_state["is_letter_lecture"] = False
             curr_state["curr_lecture"] = row_data["lectures"][0]
         curr_state["curr_lec_sec"] = row_data["lectures"][0]
+        # since this is a lecture, replace the "letter" key with "lecture"
+        row_data["lectures"][0]["lecture"] = row_data["lectures"][0]["letter"]
+        del row_data["lectures"][0]["letter"]
+        # add in course
         curr_state["curr_courses"].append(row_data)
     elif kind == "lecsec":
         curr_state["curr_lec_sec"] = row_data
         # if course is a letter-lecture, then this is for sure another lecture
         if curr_state["is_letter_lecture"]:
             row_data["sections"] = []
+            # replace "letter" with "lecture"
+            row_data["lecture"] = row_data["letter"]
+            del row_data["letter"]
+            # add in lecture
             curr_state["curr_course"]["lectures"].append(row_data)
         # not-letter-lecture
         else:
@@ -287,8 +295,16 @@ def extract_data_from_row(tr, data, curr_state):
             if is_lecture(row_data["letter"], False):
                 row_data["sections"] = []
                 curr_state["curr_lecture"] = row_data
+                # replace "letter" with "lecture"
+                row_data["lecture"] = row_data["letter"]
+                del row_data["letter"]
+                # add in lecture
                 curr_state["curr_course"]["lectures"].append(row_data)
             else:
+                # replace "letter" with "section"
+                row_data["section"] = row_data["letter"]
+                del row_data["letter"]
+                # add in section
                 curr_state["curr_lecture"]["sections"].append(row_data)
     elif kind == "meeting":
         curr_state["curr_lec_sec"]["meetings"].append(row_data)
