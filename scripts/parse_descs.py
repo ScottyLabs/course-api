@@ -206,4 +206,7 @@ if __name__ == '__main__':
         print('Usage: parse_descs.py [INFILE] [OUTFILE]')
         sys.exit()
 
-    parse_descs(sys.argv[1], sys.argv[2])
+    inpath = sys.argv[1]
+    outpath = sys.argv[2]
+
+    parse_descs(inpath, outpath)

@@ -77,7 +77,7 @@ def parse_fces(inpath, outpath):
 
         print('Success!')
 
-    print('Writing output to file ' + sys.argv[2] + '...')
+    print('Writing output to file ' + outpath + '...')
 
     # Write to output file
     with open(outpath, 'w') as outfile:
@@ -92,4 +92,7 @@ if __name__ == '__main__':
         print('Usage: parse_fces.py [INFILE] [OUTFILE]')
         sys.exit()
 
-    parse_fces(sys.argv[1], sys.argv[2])
+    inpath = sys.argv[1]
+    outpath = sys.argv[2]
+
+    parse_fces(inpath, outpath)
