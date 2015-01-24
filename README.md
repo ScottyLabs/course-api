@@ -20,7 +20,7 @@ $ pip install -r requirements.txt
 $ python scripts/parse_descs.py [INFILE] [OUTFILE]
 ```
 
-`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments pages is included in `scripts/schedule_pages.txt`, up to date as of 2014-12-15.
+`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments pages is included in `data/schedule_pages.txt`, up to date as of 2014-12-15.
 
 `OUTFILE` is a path to write the output JSON to.
 
