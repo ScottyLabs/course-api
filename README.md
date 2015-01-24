@@ -2,11 +2,7 @@
 
 The new version of the Scheduling API, now with prerequisites, course descriptions, and more!
 
-## scripts/parse_descs.py
-
-This script is used to get course data from http://coursecatalog.web.cmu.edu pages.
-
-### Setup
+## Setup
 
 Install the project requirements (including [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/bs4/doc)) by running:
 
@@ -14,13 +10,17 @@ Install the project requirements (including [Beautiful Soup 4](http://www.crummy
 $ pip install -r requirements.txt
 ```
 
+## scripts/parse_descs.py
+
+This script is used to get course data from http://coursecatalog.web.cmu.edu pages.
+
 ###Usage
 
 ```
 $ python scripts/parse_descs.py [INFILE] [OUTFILE]
 ```
 
-`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments pages is included in `scripts/schedule_pages.txt`, up to date as of 2014-12-15.
+`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments pages is included in `data/schedule_pages.txt`, up to date as of 2014-12-15.
 
 `OUTFILE` is a path to write the output JSON to.
 
@@ -63,10 +63,6 @@ python -m json.tool out.json
 ## scripts/parse_schedules.py
 
 This script is used to get scheduling data from https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/completeSchedule pages.
-
-### Setup
-
-Exactly the same as `scripts/parse_descs.py`.
 
 ### Usage
 
