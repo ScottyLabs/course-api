@@ -85,6 +85,7 @@ def parse_fces(inpath, outpath):
 
     print('Done!')
 
+
 if __name__ == '__main__':
     # Verify arguments
     if len(sys.argv) != 3:
