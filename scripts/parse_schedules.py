@@ -141,8 +141,12 @@ def fix_known_errors(page):
                 counter += 1
             # paste it back in
             row_tag.insert_after(tr)
+
+            # continue with this new row
+            row_tag = row_tag.next_sibling
+            row = process_row(tr)
         # detect a row with a course number, title, and credits, but nothing else
-        elif all(row[:3]) and not any(row[3:]):
+        if all(row[:3]) and not any(row[3:]):
             # extract course number and credits, and move to following row. then
             # delete this orphan row
             course_num = row[0]
