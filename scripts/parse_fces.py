@@ -8,16 +8,87 @@
 #        have enough useless metadata at the beginning of the file to prevent
 #        important data from being cutoff.
 #
-#        Usage: python parse_fces.py [INFILE] [OUTFILE]
+#        Usage: python parse_fces.py [OUTFILE] [USERNAME] [PASSWORD]
 #
-#        INFILE: A .msxml file downloaded from the FCE website.
 #        OUTFILE: Where to place resulting JSON.
+#        USERNAME: Andrew username to use to download data.
+#        PASSWORD: Andrew password to use to download data.
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2015-01-22
 
 import sys
 import json
 import bs4
+import copy
+import cmu_auth
+import urllib.parse
+
+
+# Constants
+SOURCE_URL = 'https://student.smartevals.com/reporting/SurveyResults.aspx'
+URL_PARAMS = {
+    'xp': 't',
+    'hg': 't',
+    'dep': 'all',
+    't': 'all',
+    'lvty': 'all/all/all',
+    'st': 'meantext',
+    'sat': 'all',
+    'cat': 'all',
+    'q': 'all',
+    'y': 'all',
+    'gb': 'CourseID',
+    'b': 'all',
+    'c': 'all',
+    'cg': 'all',
+    'u': 'all',
+    'ds': 'normal',
+    'srfall': 'Y'
+}
+FORM_DATA = {
+    '_ctl0:hdnPersonAuth': '82/233/1805489/1428263344/SKWPO8qP1Y4PcI_MMc6FLqXHtB4',
+    '_ctl0:cphContent:rddset:sfexporter:drp_FileType': 'msoXML',
+    '_ctl0:cphContent:rddset:sfexporter:chk_Defaults': 'on',
+    '_ctl0:cphContent:rddset:sfexporter:chk_ShowColumnTitles': 'on',
+    '_ctl0:cphContent:rddset:sfexporter:btnSubmit': 'Export',
+    '_ctl0:chkColumns_0': 'on',
+    '_ctl0:chkColumns_1': 'on',
+    '_ctl0:chkColumns_2': 'on',
+    '_ctl0:chkColumns_5': 'on',
+    '_ctl0:chkColumns_6': 'on',
+    '_ctl0:chkColumns_7': 'on',
+    '_ctl0:chkColumns_8': 'on',
+    '_ctl0:chkColumns_9': 'on',
+}
+DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
+
+
+# @function download_fces
+# @brief Downloads FCE data from the smartevals website as MSXML.
+# @param div: The smartevals website divides departments into "div"'s seemingly
+#        arbitrarily, each one having a code.
+# @param username: Andrew username to use for authentication.
+# @param password: Andrew password to use for authentication.
+# @return: Raw text for the MSXML file for this division's FCE data
+def download_fces(div, username, password):
+    # Create target URL
+    parameters = copy.copy(URL_PARAMS)
+    parameters['div'] = div
+    url = SOURCE_URL + '?' + urllib.parse.urlencode(parameters)
+
+    # Download export form
+    s = cmu_auth.authenticate(url, username, password)
+    pst = s.get(url, data=FORM_DATA)
+    soup = bs4.BeautifulSoup(pst.text)
+
+    # Get some metadata we need
+    viewstate = soup.find('input', {'id': '__VIEWSTATE'})['value']
+    formdata = copy.copy(FORM_DATA)
+    formdata['__VIEWSTATE'] = viewstate
+
+    # Download output MSXML
+    pst2 = s.post(url, data=formdata)
+    return pst2.text
 
 
 # @function parse_table
@@ -59,40 +130,44 @@ def parse_table(table):
 
 
 # @function parse_fces
-# @brief Parses FCE data from the passed file, and writes it as JSON to the
-#        output file.
-# @param inpath: File path for a text file containing fully qualified
-#        URLS for course description pages, separated by newlines.
-# @param outpath: File path to write output JSON to.
-def parse_fces(inpath, outpath):
+# @brief Downloads and parses FCE data to JSON.
+# @param username: Andrew username to use for authentication.
+# @param password: Andrew password to use for authentication.
+# @return: FCE data for all departments and years as JSON.
+def parse_fces(username, password):
+    data = []
 
-    # Get information
-    with open(inpath, 'r') as infile:
+    # Iterate through all colleges
+    for div in DIVS:
+        # Download FCE data
+        print('Downloading data for div ' + str(div) + '...')
+        downloaded = download_fces(div, username, password)
 
-        print('Reading file data...')
-        soup = bs4.BeautifulSoup(infile)
+        # Parse data into dictionary
+        print('Parsing data...')
+        soup = bs4.BeautifulSoup(downloaded)
+        data += parse_table(soup.find('table'))
 
-        print('Parsing...')
-        data = parse_table(soup.find('table'))
-
-        print('Success!')
-
-    print('Writing output to file ' + outpath + '...')
-
-    # Write to output file
-    with open(outpath, 'w') as outfile:
-        json.dump(data, outfile)
-
-    print('Done!')
+    # Return as JSON
+    return json.dumps(data)
 
 
 if __name__ == '__main__':
     # Verify arguments
-    if len(sys.argv) != 3:
-        print('Usage: parse_fces.py [INFILE] [OUTFILE]')
+    if len(sys.argv) != 4:
+        print('Usage: parse_fces.py [OUTFILE] [USERNAME] [PASSWORD]')
         sys.exit()
 
-    inpath = sys.argv[1]
-    outpath = sys.argv[2]
+    outpath = sys.argv[1]
+    username = sys.argv[2]
+    password = sys.argv[3]
 
-    parse_fces(inpath, outpath)
+    # Get and write out JSON
+    print("Parsing FCEs...")
+    data = parse_fces(username, password)
+
+    print("Writing data...")
+    with open(outpath, 'w') as outfile:
+        outfile.write(data)
+
+    print("Done!")
