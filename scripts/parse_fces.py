@@ -22,9 +22,11 @@ import bs4
 import copy
 import cmu_auth
 import urllib.parse
+import getpass
 
 
 # Constants
+USAGE = 'Usage: python parse_fces.py [OUTFILE] <USERNAME PASSWORD>'
 SOURCE_URL = 'https://student.smartevals.com/reporting/SurveyResults.aspx'
 URL_PARAMS = {
     'xp': 't',
@@ -155,13 +157,18 @@ def parse_fces(username, password):
 
 if __name__ == '__main__':
     # Verify arguments
-    if len(sys.argv) != 4:
-        print('Usage: parse_fces.py [OUTFILE] [USERNAME] [PASSWORD]')
+    if not (len(sys.argv) == 4 or len(sys.argv) == 2):
+        print(USAGE)
         sys.exit()
 
     outpath = sys.argv[1]
-    username = sys.argv[2]
-    password = sys.argv[3]
+
+    if (len(sys.argv) == 2):
+        username=input('Username: ')
+        password = getpass.getpass()
+    else:
+        username = sys.argv[2]
+        password = sys.argv[3]
 
     # Get and write out JSON
     print("Parsing FCEs...")
