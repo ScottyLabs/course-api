@@ -4,7 +4,7 @@ The new version of the Scheduling API, now with prerequisites, course descriptio
 
 ## Setup
 
-Install the project requirements (including [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/bs4/doc)) by running:
+Install the project requirements (including [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/bs4/doc) and [cmu_auth](http://github.com/willcrichton/cmu_auth)) by running:
 
 ```
 $ pip install -r requirements.txt
@@ -28,7 +28,7 @@ This script is used to get course data from http://coursecatalog.web.cmu.edu pag
 $ python scripts/parse_descs.py [INFILE] [OUTFILE]
 ```
 
-`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments pages is included in `data/schedule_pages.txt`, up to date as of 2014-12-15.
+`INFILE` is the path of a file containing a list of newline delineated fully qualified links to the pages to parse. A file which includes links to all departments' pages is included in `data/schedule_pages.txt`, up to date as of 2014-12-15.
 
 `OUTFILE` is a path to write the output JSON to.
 
@@ -56,7 +56,7 @@ Field    | Type       | Description
 ---------|------------|------------
 num      | int        | Course number (without dash)
 name     | String     | Course name
-units    | int        | Units awarded by course
+units    | float      | Units awarded by course
 semester | [String]   | List of semesters where the course is offered ("F" = Fall, "S" = Spring, "U" = Summer)
 desc     | String     | Course description
 prereqs  | String     | Course prerequisites as a string.

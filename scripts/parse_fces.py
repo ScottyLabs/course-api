@@ -122,15 +122,15 @@ def parse_table(table):
             for index, cell in enumerate(cells):
                 # Parse cell value
                 value = cell.string.strip()
+                if not value:
+                    value = None
                 if index < question_start:
-                    if cell.data['ss:type'] == 'Number':
+                    if cell.data['ss:type'] == 'Number' and value:
                         value = int(value)
                     obj[columns[index]] = value
                 else:
                     if value:
                         value = float(value)
-                    else:
-                        value = None
                     questions[columns[index]] = value
 
             obj['Questions'] = questions
