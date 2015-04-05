@@ -10,6 +10,14 @@ Install the project requirements (including [Beautiful Soup 4](http://www.crummy
 $ pip install -r requirements.txt
 ```
 
+## Minification
+
+By default, all output data is stored as a minified JSON file. To get human readable JSON, use the command (for output file `out.json`):
+
+```
+python -m json.tool out.json
+```
+
 ## scripts/parse_descs.py
 
 This script is used to get course data from http://coursecatalog.web.cmu.edu pages.
@@ -54,11 +62,62 @@ desc     | String     | Course description
 prereqs  | String     | Course prerequisites as a string.
 coreqs   | String     | Course corequisites as a string.
 
-By default, this data is stored minified in the output file. To get human readable JSON, use the command (for output file `out.json`):
+## scripts/parse_fces.py
+
+This script is used to get FCE data from https://cmu.smartevals.com/ pages.
+
+### Usage
 
 ```
-python -m json.tool out.json
+$ python3 scripts/parse_fces.py [OUTFILE]
+$ python3 sceipts/parse_fces.py [OUTFILE] <USERNAME> <PASSWORD>
 ```
+
+`OUTFILE` is a path to write the output JSON to.
+
+`USERNAME` is the Andrew username used for authentication. If not specified, you will be prompted to input one.
+
+`PASSWORD` is the Andrew password u sed for authenication. If not specified, you will be prompted to input one.
+
+### Output format
+
+Beware that any field below may have `null` instead of the expected value.
+
+Output data is formatted as a list of sections, each with their own statistics:
+
+```
+[
+    ...,
+    {
+        "Course ID": 12671,
+        "Course Name": "FND CONCPT COMP CEE",
+        "Dept": "CEE",
+        "Enrollment": 7,
+        "Instructor": "FINGER, S.",
+        "Resp. Rate %": "71%",
+        "Responses": 5,
+        "Section": "A3",
+        "Semester": "Spring",
+        "Type": "Lect",
+        "Year": 2015,
+        "Questions": {
+            "1: Hrs Per Week 9": 10.0,
+            "2: Interest in student learning": 4.8,
+            "3: Explain course requirements": 4.4,
+            "4: Clear learning goals": 4.4,
+            "5: Feedback to students": 5.0,
+            "6: Importance of subject": 4.4,
+            "7: Explains subject matter": 4.8,
+            "8: Show respect for students": 5.0,
+            "9: Overall teaching": 4.8
+            "10: Overall course": 4.6,
+        }
+    },
+    ...
+]
+```
+
+All fields are subject to change depending on how CMU's departments decide to structure their FCEs for a given semester. The fields available and their names are very likely to be different between semesters and departments. Please see https://cmu.smartevals.com/ for the exact format. All keys are column names corresponding to their value. Questions (columns starting with a number) are sorted into their own "Questions" field, with the question as the key and the result as a float value.
 
 ## scripts/parse_schedules.py
 
@@ -194,9 +253,3 @@ location | String | The location of the lecture or section's meeting. Probably P
 room     | String | The building and/or room in which the lecture or section meets.
 
 Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively.
-
-By default, this data is stored minified in the output file. To get human readable JSON, use the command (for output file `out.json`):
-
-```
-python -m json.tool out.json
-```
