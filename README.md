@@ -2,6 +2,10 @@
 
 The new version of the Scheduling API, now with prerequisites, course descriptions, and more!
 
+This project is structured as a number of scraper scripts which parse
+information from various sources including the Course Catalog, the
+Schedule of Classes, and the site for FCEs.
+
 ## Setup
 
 Install the project requirements (including [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/bs4/doc)) by running:
