@@ -102,6 +102,7 @@ def parse_table(table):
     rows = table.find_all('row')
     columns = []
     result = []
+    question_start = 0
 
     for row in rows:
         cells = row.find_all('cell')
@@ -109,24 +110,30 @@ def parse_table(table):
             # Columns are not consistent in a table - update them when
             # new labels are found.
             columns = [lbl.string.strip() for lbl in row if lbl.string.strip()]
+            question_start = next((i for i, col in enumerate(columns)
+                    if col[0].isdigit()), len(columns))
         else:
             # Remove empty cells
             cells = cells[:len(columns)]
 
             # Build object to represent this section
             obj = {}
+            questions = {}
             for index, cell in enumerate(cells):
                 # Parse cell value
                 value = cell.string.strip()
-                if cell.data['ss:type'] == 'Number':
-                    if (columns[index][0].isdigit()):
-                        # Rating for a question
+                if index < question_start:
+                    if cell.data['ss:type'] == 'Number':
+                        value = int(value)
+                    obj[columns[index]] = value
+                else:
+                    if value:
                         value = float(value)
                     else:
-                        # Other measures
-                        value = int(value)
-                obj[columns[index]] = value
+                        value = None
+                    questions[columns[index]] = value
 
+            obj['questions'] = questions
             result.append(obj)
 
     return result
