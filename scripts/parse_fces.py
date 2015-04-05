@@ -27,6 +27,7 @@ import getpass
 
 # Constants
 USAGE = 'Usage: python parse_fces.py [OUTFILE] <USERNAME PASSWORD>'
+LOGIN_URL = 'https://cmu.smartevals.com/secure/Login.aspx'
 SOURCE_URL = 'https://student.smartevals.com/reporting/SurveyResults.aspx'
 URL_PARAMS = {
     'xp': 't',
@@ -48,8 +49,6 @@ URL_PARAMS = {
     'srfall': 'Y'
 }
 FORM_DATA = {
-    '_ctl0:hdnPersonAuth':
-        '82/233/1805489/1428346920/GQn5OzIhQgdNqlO6qQ1iLAKu9k0',
     '_ctl0:cphContent:rddset:sfexporter:drp_FileType': 'msoXML',
     '_ctl0:cphContent:rddset:sfexporter:chk_Defaults': 'on',
     '_ctl0:cphContent:rddset:sfexporter:chk_ShowColumnTitles': 'on',
@@ -66,27 +65,48 @@ FORM_DATA = {
 DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
 
 
+# @function authenicate
+# @brief Gets the authenication token that needs to be included to query FCE
+#        data.
+# @param username: Andrew username to use for authentication.
+# @param password: Andrew password to use for authentication.
+def authenicate(username, password):
+    # Login
+    s = cmu_auth.authenticate(LOGIN_URL, username, password)
+    login_page = s.get(LOGIN_URL)
+    soup = bs4.BeautifulSoup(login_page.text)
+
+    # Parse needed authenication token
+    login_link = soup.find('a', {'id': 'HyperLink1'})['href']
+    login_link_queries = urllib.parse.urlparse(login_link)[4]
+    hdnPersonAuth = urllib.parse.parse_qs(login_link_queries)['a2e'][0]
+
+    return hdnPersonAuth
+
+
 # @function download_fces
 # @brief Downloads FCE data from the smartevals website as MSXML.
 # @param div: The smartevals website divides departments into "div"'s seemingly
 #        arbitrarily, each one having a code.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
+# @param authtoken: Authenication token returned by authenticate.
 # @return: Raw text for the MSXML file for this division's FCE data
-def download_fces(div, username, password):
+def download_fces(div, username, password, authtoken):
     # Create target URL
     parameters = copy.copy(URL_PARAMS)
     parameters['div'] = div
     url = SOURCE_URL + '?' + urllib.parse.urlencode(parameters)
 
-    # Download export form
-    s = cmu_auth.authenticate(url, username, password)
-    pst = s.get(url, data=FORM_DATA)
-    soup = bs4.BeautifulSoup(pst.text)
-
-    # Get some metadata we need
-    viewstate = soup.find('input', {'id': '__VIEWSTATE'})['value']
+    # Build form input
     formdata = copy.copy(FORM_DATA)
+    formdata['_ctl0:hdnPersonAuth'] = authtoken
+
+    # Get viewstate
+    s = cmu_auth.authenticate(url, username, password)
+    export_page = s.get(url, data=formdata).content
+    soup = bs4.BeautifulSoup(export_page)
+    viewstate = soup.find('input', {'id': '__VIEWSTATE'})['value']
     formdata['__VIEWSTATE'] = viewstate
 
     # Download output MSXML
@@ -111,7 +131,7 @@ def parse_table(table):
             # new labels are found.
             columns = [lbl.string.strip() for lbl in row if lbl.string.strip()]
             question_start = next((i for i, col in enumerate(columns)
-                    if col[0].isdigit()), len(columns))
+                                   if col[0].isdigit()), len(columns))
         else:
             # Remove empty cells
             cells = cells[:len(columns)]
@@ -147,14 +167,18 @@ def parse_table(table):
 def parse_fces(username, password):
     data = []
 
+    # Authenticate
+    print('Authenticating...')
+    authtoken = authenicate(username, password)
+
     # Iterate through all colleges
     for div in DIVS:
         # Download FCE data
         print('Downloading data for div ' + str(div) + '...')
-        downloaded = download_fces(div, username, password)
+        downloaded = download_fces(div, username, password, authtoken)
 
         # Parse data into dictionary
-        print('Parsing data...')
+        print('Parsing...')
         soup = bs4.BeautifulSoup(downloaded)
         data += parse_table(soup.find('table'))
 
@@ -171,14 +195,14 @@ if __name__ == '__main__':
     outpath = sys.argv[1]
 
     if (len(sys.argv) == 2):
-        username=input('Username: ')
+        username = input('Username: ')
         password = getpass.getpass()
     else:
         username = sys.argv[2]
         password = sys.argv[3]
 
     # Get and write out JSON
-    print("Parsing FCEs...")
+    print("Parsing FCEs. This will take a few minutes...")
     data = parse_fces(username, password)
 
     print("Writing data...")
