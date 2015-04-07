@@ -86,7 +86,7 @@ def authenicate(username, password):
 
 # @function download_fces
 # @brief Downloads FCE data from the smartevals website as MSXML.
-# @param div: The smartevals website divides departments into "div"'s seemingly
+# @param div: The smartevals website divides departments into 'div''s seemingly
 #        arbitrarily, each one having a code.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
@@ -202,11 +202,11 @@ if __name__ == '__main__':
         password = sys.argv[3]
 
     # Get and write out JSON
-    print("Parsing FCEs. This will take a few minutes...")
+    print('Parsing FCEs. This will take a few minutes...')
     data = parse_fces(username, password)
 
-    print("Writing data...")
+    print('Writing data...')
     with open(outpath, 'w') as outfile:
         outfile.write(data)
 
-    print("Done!")
+    print('Done!')
