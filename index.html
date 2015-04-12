@@ -1,0 +1,113 @@
+---
+# The dashes force this to be rendered by Jekyll
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ScottyLabs Course API</title>
+    <!-- TODO:
+    <meta name="description" content="TODO">
+    <link rel="icon" href="/favicon.png">
+      -->
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/main.css">
+
+
+    <link rel="canonical" href="{{ site.url }}/{{ site.baseurl }}{{ page.url }}">
+  </head>
+  <body>
+    <!-- logo -->
+    <a class="floating-logo" href="https://scottylabs.org/">
+      <img src="{{ site.baseurl }}/assets/img/spark.svg">
+    </a>
+
+    <!-- Landing pane -->
+    <div class="hero-bg"></div>
+    <div class="hero-fg vertical-center">
+      <h1>ScottyLabs Course API</h1>
+      <h2>make more powerful apps for CMU courses</h>
+    </div>
+    <div class="scroll-hint vertical-center">
+      <i class="fa fa-chevron-down"></i>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <section>
+        <div class="column">
+          <h2>About</h2>
+          <p>
+            ScottyLabs is proud to provide a simple project for accessing
+            information about CMU course information. This project continues that
+            tradition by completely revamping the way we've provided this
+            information before.
+          </p>
+          <p>
+            The Course API accesses CMU-provided information from
+          </p>
+          <ul>
+            <li>the Schedule of Classes (SoC)</li>
+            <li>the Course Catalogs</li>
+            <li>Faculty Course Evaluations (FCEs)</li>
+          </ul>
+          <p>
+            It packages all this up into a neat set of scripts that download the
+            information and store it as JSON. The rest is up to you.
+          </p>
+          <p>
+            All told, the Course API can get you information that includes
+          </p>
+          <ul>
+            <li>course descriptions</li>
+            <li>units</li>
+            <li>pre- and co-requisites</li>
+            <li>FCE responses</li>
+          </ul>
+          <p>
+            ... and more!
+          </p>
+        </div>
+      </section>
+      <section>
+        <div class="column">
+          <h2>Getting Started &amp; Documentation</h2>
+          <p>
+            All you need to know is available <a
+              href="https://github.com/ScottyLabs/course-api">on GitHub</a>.
+            It'll walk you through the process of getting started using the
+            project, and it documents what specific pieces of information are
+            available.
+          </p>
+          <h3>
+            <a href="https://github.com/ScottyLabs/course-api">ScottyLabs/course-api</a>
+          </h3>
+          <p>
+            Keep in mind that this project is still being developed, so things
+            are likely to change. If you notice something not quite right, be
+            sure to <a
+            href="https://github.com/ScottyLabs/course-api/issues">open an
+            issue</a> on GitHub letting us know. While you're there, feel free to
+            check out the things we're currently working on!
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <a href="https://scottylabs.org">
+          <img src="{{ site.baseurl }}/assets/img/spark.svg">
+        </a>
+        <p>
+        a <a href="https://scottylabs.org">ScottyLabs</a> project
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

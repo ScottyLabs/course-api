@@ -1,0 +1,16 @@
+title: ScottyLabs Course API
+description: > # trailing whitespace is important!
+  The new-and-improved Course API from ScottyLabs, now featuring 
+  pre-requisites, course descriptions, and more!
+baseurl: "/course-api"
+url: "https://scottylabs.org"
+
+exclude:
+  - README.md
+  - LICENSE
+  - Gemfile.lock
+  - Gemfile
+
+sass:
+  sass_dir: _sass
+  style: compressed

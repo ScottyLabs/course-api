@@ -1,0 +1,86 @@
+html, body {
+  height: 100%;
+}
+
+.floating-logo {
+  display: block;
+
+  margin: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 1;
+
+  img {
+    height: 60px;
+  }
+}
+
+.hero-bg {
+  background-image: url('../img/hero-1200.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  // Hide white blur around border
+  position: fixed;
+  top: -6px;
+  right: -6px;
+  bottom: -6px;
+  left: -6px;
+
+  z-index: -1;
+
+  -webkit-filter: blur(6px);
+          filter: blur(6px);
+}
+
+.vertical-center {
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+}
+
+.hero-fg {
+  height: 80%;
+  padding: 5px;
+}
+
+.scroll-hint {
+  height: 20%;
+}
+
+.content {
+  box-shadow: 0 0 70px black;
+  background-color: #900;
+}
+
+section, footer {
+  padding: 30px;
+}
+
+.column {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer {
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+
+  img {
+    height: 100px;
+  }
+}
+
