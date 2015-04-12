@@ -32,6 +32,30 @@ USAGE = 'Usage: python parse_fces.py [SEMESTER] [OUTFILE] <USERNAME PASSWORD>'
 DESC_SOURCES = 'data/schedule_pages.txt'
 
 
+# @function aggregate
+# @brief Combines the course descriptions, schedules, and FCEs data sets into
+#        one object.
+# @param descs: Course desciptions object as returned by parse_descs.
+# @param schedules: Course schedules object as returned by parse_descs.
+# @param fces: FCEs object as returned by parse_descs.
+def aggregate(descs, schedules, fces):
+    courses = {}
+
+    for department in schedules:
+        for course in department['courses']:
+            for desc in descs:
+                if ('num' in desc and desc['num'] == int(course['num'])):
+                    desc['department'] = department['department']
+                    desc['lectures'] = course['lectures']
+
+                    num = desc['num']
+                    del desc['num']
+
+                    courses[str(num)] = desc
+
+    return {'courses': courses, 'fces': fces}
+
+
 if __name__ == '__main__':
     # Verify arguments
     if not (len(sys.argv) == 5 or len(sys.argv) == 3):
@@ -50,16 +74,17 @@ if __name__ == '__main__':
 
     print('Scottylabs CMU Course-API')
 
-    results = {}
-
     print('Retrieving course descriptions:')
-    results['descs'] = parse_descs(DESC_SOURCES)
+    descs = parse_descs(DESC_SOURCES)
 
     print('Retrieving course schedule:')
-    results['schedules'] = parse_schedules(semester)
+    schedules = parse_schedules(semester)
 
     print('Retrieving FCEs:')
-    results['fces'] = parse_fces(username, password)
+    fces = parse_fces(username, password)
+
+    print('Aggregating data...')
+    results = aggregate(descs, schedules, fces)
 
     print('Writing data...')
     with open(outpath, 'w') as outfile:

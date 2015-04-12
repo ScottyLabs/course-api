@@ -65,12 +65,12 @@ FORM_DATA = {
 DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
 
 
-# @function authenicate
+# @function authenticate
 # @brief Gets the authenication token that needs to be included to query FCE
 #        data.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
-def authenicate(username, password):
+def authenticate(username, password):
     # Login
     s = cmu_auth.authenticate(LOGIN_URL, username, password)
     login_page = s.get(LOGIN_URL)
@@ -169,7 +169,7 @@ def parse_fces(username, password):
 
     # Authenticate
     print('Authenticating...')
-    authtoken = authenicate(username, password)
+    authtoken = authenticate(username, password)
 
     # Iterate through all colleges
     for div in DIVS:
@@ -183,7 +183,7 @@ def parse_fces(username, password):
         data += parse_table(soup.find('table'))
 
     # Return as JSON
-    return json.dumps(data)
+    return data
 
 
 if __name__ == '__main__':
@@ -207,6 +207,6 @@ if __name__ == '__main__':
 
     print('Writing data...')
     with open(outpath, 'w') as outfile:
-        outfile.write(data)
+        json.dump(data, outfile)
 
     print('Done!')

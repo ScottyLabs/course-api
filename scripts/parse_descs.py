@@ -59,9 +59,9 @@ def extract_units_semester_info(line):
     if 'Spring' in semester_text:
         semester.append('S')
     if 'Summer' in semester_text:
-        semester.append('U')
+        semester.append('M')
     if 'All' in semester_text:
-        semester = ['F', 'S', 'U']
+        semester = ['F', 'S', 'M']
 
     return (units, semester)
 
