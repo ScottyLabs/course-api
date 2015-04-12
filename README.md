@@ -22,6 +22,62 @@ By default, all output data is stored as a minified JSON file. To get human read
 python -m json.tool out.json
 ```
 
+## course-api.py
+
+This script retrieves data from all three datasets for a specific semester.
+
+###Usage
+
+```
+$ python3 course-api.py [SEMESTER] [OUTFILE]
+$ python3 sceipts/parse_fces.py [SEMESTER] [OUTFILE] <USERNAME> <PASSWORD>
+```
+
+`SEMESTER` is the school semester for which you wish to retrieve scheduling data. It must be one of S, M1, M2, or F.
+
+`OUTFILE` is a path to write the output JSON to.
+
+`USERNAME` is the Andrew username used for authentication. If not specified, you will be prompted to input one.
+
+`PASSWORD` is the Andrew password u sed for authenication. If not specified, you will be prompted to input one.
+
+### Output format
+
+Scraped data is output in the following form:
+
+```
+{
+    "courses": {
+        ...,
+        "15122": {
+            "name": "Principles of Imperative Computation"
+            "department": "Computer Science"
+            "units": 10.0
+            "semester": ["F", "S"]
+            "desc": "For students with a basic understanding of programming..."
+            "prereqs": "15-112"
+            "coreqs": "15-151 and 21-127"
+            "lectures": <Lecture object>
+        },
+        ...
+    }
+    "fces": <FCEs object>
+}
+```
+
+Field      | Type       | Description
+-----------|------------|------------
+courses    | {}         | Object containing course information, with course numbers as keys
+name       | String     | Course name
+department | String     | Department name
+units      | float      | Units awarded by course
+semester   | [String]   | List of semesters where the course is offered ("F" = Fall, "S" = Spring, "M" = Summer)
+desc       | String     | Course description
+prereqs    | String     | Course prerequisites as a string
+coreqs     | String     | Course corequisites as a string
+lectures   | {}         | Lectures and sections for this semester. See the `parse_schedules.py` [documentation](#output-format-3) for more info.
+fces       | {}         | All historical FCEs, organized by section. See the `parse_fces.py` [documentation](#output-format-2) for more info.
+
 ## scripts/parse_descs.py
 
 This script is used to get course data from http://coursecatalog.web.cmu.edu pages.
@@ -152,7 +208,7 @@ Scraped data consists of a list of departments. A department has the form:
             <course object>,
             ...
         ],
-        "deparment": "Computer Science"
+        "department": "Computer Science"
     },
     ...
 ]
