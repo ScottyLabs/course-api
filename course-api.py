@@ -65,6 +65,10 @@ if __name__ == '__main__':
     semester = sys.argv[1]
     outpath = sys.argv[2]
 
+    if semester not in ['S', 'M1', 'M2', 'F']:
+        print('Requested quarter is not one of [\'S\', \'M1\', \'M2\', \'F\']')
+        sys.exit()
+
     if (len(sys.argv) == 3):
         username = input('Username: ')
         password = getpass.getpass()
