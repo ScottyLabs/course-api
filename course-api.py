@@ -28,8 +28,7 @@ from scripts.parse_fces import parse_fces
 
 
 # Constants
-USAGE = 'Usage: python parse_fces.py [SEMESTER] [OUTFILE] <USERNAME PASSWORD>'
-DESC_SOURCES = 'data/schedule_pages.txt'
+USAGE = 'Usage: python course-api.py [SEMESTER] [OUTFILE] <USERNAME PASSWORD>'
 
 
 # @function aggregate
