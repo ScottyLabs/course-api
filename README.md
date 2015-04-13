@@ -30,7 +30,7 @@ This script retrieves data from all three datasets for a specific semester.
 
 ```
 $ python3 course-api.py [SEMESTER] [OUTFILE]
-$ python3 sceipts/parse_fces.py [SEMESTER] [OUTFILE] <USERNAME> <PASSWORD>
+$ python3 course-api.py [SEMESTER] [OUTFILE] <USERNAME> <PASSWORD>
 ```
 
 `SEMESTER` is the school semester for which you wish to retrieve scheduling data. It must be one of S, M1, M2, or F.
@@ -39,7 +39,7 @@ $ python3 sceipts/parse_fces.py [SEMESTER] [OUTFILE] <USERNAME> <PASSWORD>
 
 `USERNAME` is the Andrew username used for authentication. If not specified, you will be prompted to input one.
 
-`PASSWORD` is the Andrew password u sed for authenication. If not specified, you will be prompted to input one.
+`PASSWORD` is the Andrew password used for authentication. If not specified, you will be prompted to input one.
 
 ### Output format
 
@@ -130,7 +130,7 @@ This script is used to get FCE data from https://cmu.smartevals.com/ pages.
 
 ```
 $ python3 scripts/parse_fces.py [OUTFILE]
-$ python3 sceipts/parse_fces.py [OUTFILE] <USERNAME> <PASSWORD>
+$ python3 scripts/parse_fces.py [OUTFILE] <USERNAME> <PASSWORD>
 ```
 
 `OUTFILE` is a path to write the output JSON to.

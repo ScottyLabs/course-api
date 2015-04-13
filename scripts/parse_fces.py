@@ -195,6 +195,8 @@ if __name__ == '__main__':
     outpath = sys.argv[1]
 
     if (len(sys.argv) == 2):
+        print('Please input your Andrew username and password. '
+              'We never store your login info.')
         username = input('Username: ')
         password = getpass.getpass()
     else:

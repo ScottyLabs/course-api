@@ -31,6 +31,7 @@ from scripts.parse_fces import parse_fces
 USAGE = 'Usage: python course-api.py [SEMESTER] [OUTFILE] <USERNAME PASSWORD>'
 DESC_SOURCES = 'data/schedule_pages.txt'
 
+
 # @function aggregate
 # @brief Combines the course descriptions, schedules, and FCEs data sets into
 #        one object.
@@ -65,10 +66,12 @@ if __name__ == '__main__':
     outpath = sys.argv[2]
 
     if semester not in ['S', 'M1', 'M2', 'F']:
-        print('Requested quarter is not one of [\'S\', \'M1\', \'M2\', \'F\']')
+        print("Requested quarter is not one of ['S', 'M1', 'M2', 'F']")
         sys.exit()
 
     if (len(sys.argv) == 3):
+        print('Please input your Andrew username and password. '
+              'We never store your login info.')
         username = input('Username: ')
         password = getpass.getpass()
     else:
