@@ -59,9 +59,9 @@ def extract_units_semester_info(line):
     if 'Spring' in semester_text:
         semester.append('S')
     if 'Summer' in semester_text:
-        semester.append('U')
+        semester.append('M')
     if 'All' in semester_text:
-        semester = ['F', 'S', 'U']
+        semester = ['F', 'S', 'M']
 
     return (units, semester)
 
@@ -164,8 +164,8 @@ def get_page(url):
 #        them as JSON to the output file.
 # @param inpath: File path for a text file containing fully qualified
 #        URLS for course description pages, separated by newlines.
-# @param outpath: File path to write output JSON to.
-def parse_descs(inpath, outpath):
+# @return: Course desciption data as a list.
+def parse_descs(inpath):
     # Array of result course information
     results = []
 
@@ -192,13 +192,8 @@ def parse_descs(inpath, outpath):
 
             print('Success!')
 
-    print('Writing output to file ' + sys.argv[2] + '...')
+    return results
 
-    # Write to output file
-    with open(outpath, 'w') as outfile:
-        json.dump(results, outfile)
-
-    print('Done!')
 
 if __name__ == '__main__':
     # Verify arguments
@@ -209,4 +204,12 @@ if __name__ == '__main__':
     inpath = sys.argv[1]
     outpath = sys.argv[2]
 
-    parse_descs(inpath, outpath)
+    results = parse_descs(inpath)
+
+    print('Writing output to file ' + sys.argv[2] + '...')
+
+    # Write to output file
+    with open(outpath, 'w') as outfile:
+        json.dump(results, outfile)
+
+    print('Done!')

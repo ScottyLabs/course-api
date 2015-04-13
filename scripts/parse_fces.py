@@ -65,12 +65,12 @@ FORM_DATA = {
 DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
 
 
-# @function authenicate
+# @function authenticate
 # @brief Gets the authenication token that needs to be included to query FCE
 #        data.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
-def authenicate(username, password):
+def authenticate(username, password):
     # Login
     s = cmu_auth.authenticate(LOGIN_URL, username, password)
     login_page = s.get(LOGIN_URL)
@@ -86,7 +86,7 @@ def authenicate(username, password):
 
 # @function download_fces
 # @brief Downloads FCE data from the smartevals website as MSXML.
-# @param div: The smartevals website divides departments into "div"'s seemingly
+# @param div: The smartevals website divides departments into 'div''s seemingly
 #        arbitrarily, each one having a code.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
@@ -169,7 +169,7 @@ def parse_fces(username, password):
 
     # Authenticate
     print('Authenticating...')
-    authtoken = authenicate(username, password)
+    authtoken = authenticate(username, password)
 
     # Iterate through all colleges
     for div in DIVS:
@@ -183,7 +183,7 @@ def parse_fces(username, password):
         data += parse_table(soup.find('table'))
 
     # Return as JSON
-    return json.dumps(data)
+    return data
 
 
 if __name__ == '__main__':
@@ -195,6 +195,8 @@ if __name__ == '__main__':
     outpath = sys.argv[1]
 
     if (len(sys.argv) == 2):
+        print('Please input your Andrew username and password. '
+              'We never store your login info.')
         username = input('Username: ')
         password = getpass.getpass()
     else:
@@ -202,11 +204,11 @@ if __name__ == '__main__':
         password = sys.argv[3]
 
     # Get and write out JSON
-    print("Parsing FCEs. This will take a few minutes...")
+    print('Parsing FCEs. This will take a few minutes...')
     data = parse_fces(username, password)
 
-    print("Writing data...")
+    print('Writing data...')
     with open(outpath, 'w') as outfile:
-        outfile.write(data)
+        json.dump(data, outfile)
 
-    print("Done!")
+    print('Done!')
