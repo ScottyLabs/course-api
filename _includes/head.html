@@ -5,7 +5,19 @@
 
 <!-- SEO and social media -->
 <meta name="description" content="{{ site.description }}">
-
+<meta name="keywords" content="Carnegie Mellon University CMU ScottyLabs course API data classes scheduling apis">
+<!-- Facebook -->
+<meta proprty="og:url" content="{{ site.url }}/{{ site.baseurl }}{{ page.url }}">
+<meta proprty="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta proprty="og:description" content="{{ site.description }}">
+<meta proprty="og:site_name" content="ScottyLabs">
+<meta proprty="og:image" content="{{ site.baseurl }}/assets/img/hero.jpg">
+<meta proprty="og:type" content="product">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ site.baseurl }}/assets/img/hero.jpg">
+<meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta name="twitter:description" content="{{ site.description }}">
 
 <!-- favicon relative to ScottyLabs/scottylabs.github.io site -->
 <link rel="icon" href="/img/favicon.png">
