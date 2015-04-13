@@ -32,8 +32,8 @@ html, body {
 
   z-index: -1;
 
-  -webkit-filter: blur(6px);
-          filter: blur(6px);
+  -webkit-filter: blur(2px);
+          filter: blur(2px);
 }
 
 .vertical-center {
@@ -57,7 +57,7 @@ html, body {
 }
 
 .content {
-  box-shadow: 0 0 70px black;
+  box-shadow: 0 0 10px black;
   background-color: #900;
 }
 
