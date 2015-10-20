@@ -74,7 +74,7 @@ def authenticate(username, password):
     # Login
     s = cmu_auth.authenticate(LOGIN_URL, username, password)
     login_page = s.get(LOGIN_URL)
-    soup = bs4.BeautifulSoup(login_page.text)
+    soup = bs4.BeautifulSoup(login_page.text, 'html.parser')
 
     # Parse needed authenication token
     login_link = soup.find('a', {'id': 'HyperLink1'})['href']
@@ -105,7 +105,7 @@ def download_fces(div, username, password, authtoken):
     # Get viewstate
     s = cmu_auth.authenticate(url, username, password)
     export_page = s.get(url, data=formdata).content
-    soup = bs4.BeautifulSoup(export_page)
+    soup = bs4.BeautifulSoup(export_page, 'html.parser')
     viewstate = soup.find('input', {'id': '__VIEWSTATE'})['value']
     formdata['__VIEWSTATE'] = viewstate
 
@@ -179,7 +179,7 @@ def parse_fces(username, password):
 
         # Parse data into dictionary
         print('Parsing...')
-        soup = bs4.BeautifulSoup(downloaded)
+        soup = bs4.BeautifulSoup(downloaded, 'html.parser')
         data += parse_table(soup.find('table'))
 
     # Return as JSON

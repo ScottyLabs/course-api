@@ -156,7 +156,7 @@ def get_page(url):
     except (urllib.request.URLError, ValueError):
         return None
 
-    return bs4.BeautifulSoup(response.read())
+    return bs4.BeautifulSoup(response.read(), 'html.parser')
 
 
 # @function parse_descs
