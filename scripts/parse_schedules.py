@@ -74,7 +74,7 @@ def get_page(quarter):
     except:
         return None
 
-    return bs4.BeautifulSoup(response.read())
+    return bs4.BeautifulSoup(response.read(), 'html.parser')
 
 def get_table_rows(page):
     '''
