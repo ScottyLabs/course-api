@@ -23,6 +23,7 @@ import copy
 import cmu_auth
 import urllib.parse
 import getpass
+import requests
 
 
 # Constants
@@ -48,7 +49,12 @@ URL_PARAMS = {
     'ds': 'normal',
     'srfall': 'Y'
 }
-FORM_DATA = {
+DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
+SESSION_ID_COOKIE = "ASP.NET_SessionId"
+
+
+# Request form data
+formdata = {
     '_ctl0:cphContent:rddset:sfexporter:drp_FileType': 'msoXML',
     '_ctl0:cphContent:rddset:sfexporter:chk_Defaults': 'on',
     '_ctl0:cphContent:rddset:sfexporter:chk_ShowColumnTitles': 'on',
@@ -62,7 +68,6 @@ FORM_DATA = {
     '_ctl0:chkColumns_8': 'on',
     '_ctl0:chkColumns_9': 'on',
 }
-DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
 
 
 # @function authenticate
@@ -70,6 +75,7 @@ DIVS = [683, 693, 685, 691, 684, 687, 690, 2369, 733]
 #        data.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
+# @return The ASP.NET session cookie that must be set in requests.
 def authenticate(username, password):
     # Login
     s = cmu_auth.authenticate(LOGIN_URL, username, password)
@@ -81,7 +87,9 @@ def authenticate(username, password):
     login_link_queries = urllib.parse.urlparse(login_link)[4]
     hdnPersonAuth = urllib.parse.parse_qs(login_link_queries)['a2e'][0]
 
-    return hdnPersonAuth
+    # Add auth token to the form submission
+    formdata['_ctl0:hdnPersonAuth'] = hdnPersonAuth
+    return s.cookies[SESSION_ID_COOKIE]
 
 
 # @function download_fces
@@ -90,27 +98,28 @@ def authenticate(username, password):
 #        arbitrarily, each one having a code.
 # @param username: Andrew username to use for authentication.
 # @param password: Andrew password to use for authentication.
-# @param authtoken: Authenication token returned by authenticate.
+# @param sessionid: Session ID cookie to use.
 # @return: Raw text for the MSXML file for this division's FCE data
-def download_fces(div, username, password, authtoken):
+def download_fces(div, username, password, sessionid):
     # Create target URL
     parameters = copy.copy(URL_PARAMS)
     parameters['div'] = div
     url = SOURCE_URL + '?' + urllib.parse.urlencode(parameters)
 
-    # Build form input
-    formdata = copy.copy(FORM_DATA)
-    formdata['_ctl0:hdnPersonAuth'] = authtoken
+    # Build cookies
+    cookies = {
+        SESSION_ID_COOKIE: sessionid
+    }
 
     # Get viewstate
-    s = cmu_auth.authenticate(url, username, password)
-    export_page = s.get(url, data=formdata).content
+    s = requests.Session()
+    export_page = s.get(url, cookies=cookies, data=formdata).content
     soup = bs4.BeautifulSoup(export_page, 'html.parser')
     viewstate = soup.find('input', {'id': '__VIEWSTATE'})['value']
     formdata['__VIEWSTATE'] = viewstate
 
     # Download output MSXML
-    pst2 = s.post(url, data=formdata)
+    pst2 = s.post(url, cookies=cookies, data=formdata)
     return pst2.text
 
 
@@ -141,9 +150,12 @@ def parse_table(table):
             questions = {}
             for index, cell in enumerate(cells):
                 # Parse cell value
-                value = cell.string.strip()
+                value = cell.string
                 if not value:
-                    value = None
+                    continue
+
+                value = value.strip()
+
                 if index < question_start:
                     if cell.data['ss:type'] == 'Number' and value:
                         value = int(value)
@@ -169,13 +181,13 @@ def parse_fces(username, password):
 
     # Authenticate
     print('Authenticating...')
-    authtoken = authenticate(username, password)
+    sessionid = authenticate(username, password)
 
     # Iterate through all colleges
     for div in DIVS:
         # Download FCE data
         print('Downloading data for div ' + str(div) + '...')
-        downloaded = download_fces(div, username, password, authtoken)
+        downloaded = download_fces(div, username, password, sessionid)
 
         # Parse data into dictionary
         print('Parsing...')
