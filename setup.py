@@ -16,8 +16,8 @@ setup(name='cmu-course-api',
       license='MIT',
       packages=['cmu_course_api'],
       package_data={'cmu_course_api': ['data/*']},
-      requires=[
-        'beautifulsoup4 (==4.4.1)',
-        'cmu_auth (==0.1.6)'
+      install_requires=[
+        'beautifulsoup4==4.4.1',
+        'cmu_auth==0.1.6'
       ],
       scripts=['bin/cmu-course-api'])
