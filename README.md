@@ -53,7 +53,7 @@ $ python -m json.tool out.json
 
 Scraped data is output in the following form:
 
-```JSON
+```
 {
     "courses": {
         ...,
@@ -92,7 +92,7 @@ Beware that any field below may have `null` instead of the expected value.
 
 Output data is formatted as a list of sections, each with their own statistics:
 
-```JSON
+```
 [
     ...,
     {
@@ -130,7 +130,7 @@ All fields are subject to change depending on how CMU's departments decide to st
 
 A lecture has the form:
 
-```JSON
+```
 {
     "instructors": [
         "Kosbie",
@@ -159,7 +159,7 @@ sections    | [section] | List of sections for the lecture. See below for descri
 
 A section has the form:
 
-```JSON
+```
 {
     "instructors": [
         "Simmons"
@@ -181,7 +181,7 @@ section     | String    | The section's identifier. Almost always a capital lett
 
 A meeting has the form:
 
-```JSON
+```
 {
     "begin": "03:30PM",
     "days": "F",
