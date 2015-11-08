@@ -8,7 +8,8 @@ from setuptools import setup
 
 setup(name='cmu-course-api',
       version='0.1.0',
-      description='Python utility for retrieving information about courses at Carnegie Mellon University.',
+      description=('Python utility for retrieving information about courses at'
+                   ' Carnegie Mellon University.'),
       url='http://scottylabs.org/course-api',
       author='Scottylabs',
       author_email='tech@scottylabs.org',

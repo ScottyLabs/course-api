@@ -1,14 +1,8 @@
-#!/usr/bin/env python3
-# @file course-api.py
+# @file aggregate.py
 # @brief One script to rule them all.
 #
 #        Downloads schedule data for a specific semester, including course
 #        meeting times, course descriptions, pre/corequisites, FCEs, and so on.
-#        Output is parsed into a single JSON output file.
-#
-#        If you want to download just one of Course description data, course
-#        schedule data, or FCE data see the scripts/ folder.
-#
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2015-04-07
 
@@ -21,7 +15,7 @@ from cmu_course_api.parse_fces import parse_fces
 
 
 # Constants
-DESC_SOURCES = os.path.join(os.path.dirname(__file__), 'data/schedule_pages.txt')
+SOURCES = os.path.join(os.path.dirname(__file__), 'data/schedule_pages.txt')
 
 
 # @function aggregate
@@ -49,16 +43,16 @@ def aggregate(descs, schedules, fces):
     return {'courses': courses, 'fces': fces}
 
 
-# @function course_api
+# @function get_course_data
 # @brief Used for retrieving all information from the course-api for a given
 #        semester.
-# @param semester: The semester to get data for. Must be one of S, M1, M2, or F.
+# @param semester: The semester to get data for. Must be one of [S, M1, M2, F].
 # @param username: Username to use for andrew authentication.
 # @param password: Password to use for andrew authentication.
 # @return Object containing all course-api data - see README.md for more
 #        information.
 def get_course_data(semester, username, password):
-    descs = parse_descs(DESC_SOURCES)
+    descs = parse_descs(SOURCES)
     schedules = parse_schedules(semester)
     fces = parse_fces(username, password)
     return aggregate(descs, schedules, fces)
