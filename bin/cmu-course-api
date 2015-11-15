@@ -45,7 +45,7 @@ else:
 print('Scottylabs CMU Course-API')
 
 print('Getting data...')
-data = json.dump(cmu_course_api.get_course_data(semester, username, password))
+data = cmu_course_api.get_course_data(semester, username, password)
 
 print('Writing data...')
 with open(outpath, 'w') as outfile:

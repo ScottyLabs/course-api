@@ -200,3 +200,12 @@ location | String | The location of the lecture or section's meeting. Probably P
 room     | String | The building and/or room in which the lecture or section meets.
 
 Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively.
+
+## Submitting New Versions
+
+This section is directed towards maintainers.
+
+To upload a new version of the Course API to PiPy (so it's accessable through pip):
+
+1. Increment the version number in `setup.py`. We use [semantic versioning](http://semver.org), so in a version `x.y.z`, `z` should be incremented for bugfixes, `y` for new features, and `x` for versions that break compatibility.
+2. To upload a new distribution, run `python3 setup.py register sdist upload` from the root of the project. Use `ScottyLabs` as the username. The password can be found on the ScottyLabs Google Drive password store.
