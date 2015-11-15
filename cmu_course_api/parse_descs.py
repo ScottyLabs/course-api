@@ -1,19 +1,13 @@
-#!/usr/bin/env python3
 # @file parse_descs.py
 # @brief Parses course information from course descriptions pages on
-#        http://coursecatalog.web.cmu.edu/ into a JSON file.
-#
-#        Usage: python parse_descs.py [INFILE] [OUTFILE]
-#
-#        INFILE: A file containing a list of links of pages to parse.
-#        OUTFILE: Where to place resulting JSON.
+#        http://coursecatalog.web.cmu.edu/ into an object.
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2014-12-13
+
 
 import sys
 import urllib.request
 import re
-import json
 import bs4
 
 
@@ -193,23 +187,3 @@ def parse_descs(inpath):
             print('Success!')
 
     return results
-
-
-if __name__ == '__main__':
-    # Verify arguments
-    if len(sys.argv) != 3:
-        print('Usage: parse_descs.py [INFILE] [OUTFILE]')
-        sys.exit()
-
-    inpath = sys.argv[1]
-    outpath = sys.argv[2]
-
-    results = parse_descs(inpath)
-
-    print('Writing output to file ' + sys.argv[2] + '...')
-
-    # Write to output file
-    with open(outpath, 'w') as outfile:
-        json.dump(results, outfile)
-
-    print('Done!')

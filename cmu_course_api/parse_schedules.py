@@ -1,16 +1,9 @@
-#!/usr/bin/env python3
 '''
 parse_schedules.py
 Andrew Benson
 
 Parses scheduling information from the Schedule Of Classes for a
     given school quarter and year
-
-Usage: python3 parse_schedules.py [QUARTER] [OUTFILE]
-
-QUARTER: The school quarter of the schedule desired
-    (one of S/M1/M2/F)
-OUTFILE: An file where resulting JSON will be written
 
 for reference, here is what each column number refers to in the raw HTML
 0: COURSE i.e. '15122'
@@ -46,8 +39,7 @@ lettered lecture and comprise much of this category of courses.
 
 import urllib.request
 import bs4
-import json
-import sys
+
 
 def get_page(quarter):
     '''
@@ -76,6 +68,7 @@ def get_page(quarter):
 
     return bs4.BeautifulSoup(response.read(), 'html.parser')
 
+
 def get_table_rows(page):
     '''
     return a list of relevant <tr> bs4 Tags
@@ -85,6 +78,7 @@ def get_table_rows(page):
     # the first row is a weird empty row
     # the second row is the header row (Course, Title, Units, etc.)
     return page.find_all('tr')[2:]
+
 
 def fix_known_errors(page):
     '''
@@ -101,11 +95,11 @@ def fix_known_errors(page):
     - Some rows don't even have 10 columns (i.e. they leave out the
       instructor column for no good reason). that's just annoying to parse.
     - Some rows decide to split everything into two rows JUST 'CAUSE THEY CAN.
-      To be more specific, it looks like the course title is split into two. SIO's
-      behavior appears to be just using the second line.
-    - Some rows are empty except for the course title, sometimes appended with a
-      colon. Not sure what's up with that, but it adds nonsense meetings to the
-      previous section.
+      To be more specific, it looks like the course title is split into two.
+      SIO's behavior appears to be just using the second line.
+    - Some rows are empty except for the course title, sometimes appended with
+      a colon. Not sure what's up with that, but it adds nonsense meetings to
+      the previous section.
     '''
     for row_tag in get_table_rows(page):
         # detect department name. if found, bundle the tds into a tr
@@ -115,7 +109,8 @@ def fix_known_errors(page):
             last_not = row_tag
             # find all tds up to next non-td
             while True:
-                # sometimes we hit the end of the document due to corrupted bs4 parsing
+                # sometimes we hit the end of the document due to corrupted bs4
+                # parsing
                 if not last_not.next_sibling:
                     break
                 # idk why there are newlines, but we ignore them
@@ -125,8 +120,8 @@ def fix_known_errors(page):
                 # just in case we don't hit corrupted bs4 parsing after all
                 elif last_not.next_sibling.name != 'td':
                     break
-                # extract removes it from the document, and it acts like a doubly-linked
-                # list, so it patches the next_sibling pointers for us
+                # extract removes it from the document, and it acts like a
+                # doubly-linked list, so it patches the next_sibling pointers
                 else:
                     tds.append(last_not.next_sibling.extract())
             # make a new tr tag, add in the tds
@@ -145,10 +140,10 @@ def fix_known_errors(page):
             # continue with this new row
             row_tag = row_tag.next_sibling
             row = process_row(tr)
-        # detect a row with a course number, title, and credits, but nothing else
+        # detect a row with only a course number, title, and credits
         if all(row[:3]) and not any(row[3:]):
-            # extract course number and credits, and move to following row. then
-            # delete this orphan row
+            # extract course number and credits, and move to following row.
+            # then delete this orphan row
             course_num = row[0]
             course_credits = row[2]
             next_row = row_tag
@@ -159,7 +154,8 @@ def fix_known_errors(page):
             next_row.contents[0].string = course_num
             next_row.contents[2].string = course_credits
             row_tag.extract()
-        # detect a row that's empty except for possibly the course title. delete.
+        # detect a row that's empty except for possibly the course title.
+        # delete.
         elif not row[0] and row[1] and not any(row[2:]):
             row_tag.extract()
         else:
@@ -168,6 +164,7 @@ def fix_known_errors(page):
             while i < 10:
                 row_tag.append(page.new_tag('td'))
                 i += 1
+
 
 def process_row(row_tag):
     '''
@@ -182,6 +179,7 @@ def process_row(row_tag):
         else:
             res.append(tag.string)
     return res
+
 
 def parse_row(row):
     '''
@@ -205,7 +203,8 @@ def parse_row(row):
         data['meetings'] = [parse_meeting(lec_sec_data)]
         data['letter'] = lec_sec_data[3]
         if lec_sec_data[9]:
-            data['instructors'] = [inst for inst in lec_sec_data[9].split(', ')]
+            data['instructors'] = \
+                    [inst for inst in lec_sec_data[9].split(', ')]
         else:
             data['instructors'] = None
         return data
@@ -224,7 +223,7 @@ def parse_row(row):
 
     # the data can be very irregular, so we wrap with try-except
     try:
-        # case department (determined by a non-empty, non-numeric string course)
+        # case department (non-empty, non-numeric string course)
         if row[0] and not row[0].isdigit():
             return ('department', row[0])
         # case course (determined by having a numeric course)
@@ -242,8 +241,9 @@ def parse_row(row):
         else:
             return ('meeting', parse_meeting(row))
     except Exception as e:
-        print('Failed to parse row: %s; %s' %(row, e))
+        print('Failed to parse row: %s; %s' % (row, e))
         return (None, {})
+
 
 def extract_data_from_row(tr, data, curr_state):
     '''
@@ -252,7 +252,7 @@ def extract_data_from_row(tr, data, curr_state):
     # helper functions
     def is_lecture(letter, is_first_line):
         '''
-        return whether the letter represents a lecture (as opposed to a section)
+        return whether the letter represents a lecture (rather than a section)
         '''
         letter = letter.lower()
         if is_first_line:
@@ -267,11 +267,13 @@ def extract_data_from_row(tr, data, curr_state):
     # determine whether to store the dictionary, and update curr_state
     if kind == 'department':
         curr_state['curr_courses'] = []
-        data.append({'department':row_data, 'courses':curr_state['curr_courses']})
+        data.append({'department': row_data,
+                     'courses': curr_state['curr_courses']})
     elif kind == 'course':
         curr_state['curr_course'] = row_data
         row_data['lectures'][0]['sections'] = []
-        # the course determines whether lectures are denoted with 'lec' or letters
+        # the course determines whether lectures are denoted with 'lec' or
+        # letters
         if not is_lecture(row_data['lectures'][0]['letter'], True):
             curr_state['is_letter_lecture'] = True
         else:
@@ -315,6 +317,7 @@ def extract_data_from_row(tr, data, curr_state):
     else:
         raise Exception('Unexpected kind: %s', kind)
 
+
 def parse_schedules(quarter):
     '''
     given a quarter, return a Python dictionary representing the data for it
@@ -323,7 +326,8 @@ def parse_schedules(quarter):
     print('Requesting the HTML page from the network...')
     page = get_page(quarter)
     if not page:
-        print('Failed to obtain the HTML document! Check your internet connection.')
+        print('Failed to obtain the HTML document! '
+              'Check your internet connection.')
         sys.exit()
     print('Done.')
     print('Fixing errors on page...')
@@ -334,11 +338,11 @@ def parse_schedules(quarter):
     print('Done.')
     # parse each row and insert it into 'data' as appropriate
     curr_state = {
-        'curr_courses': None, # where courses should go
-        'curr_course': None, # where lectures should go
-        'curr_lec_sec': None, # where meetings should go
-        'curr_lecture': None, # where sections should go
-        'is_letter_lecture': False # whether lectures are denoted by letters
+        'curr_courses': None,       # where courses should go
+        'curr_course': None,        # where lectures should go
+        'curr_lec_sec': None,       # where meetings should go
+        'curr_lecture': None,       # where sections should go
+        'is_letter_lecture': False  # whether lectures are denoted by letters
     }
     data = []
     print('Parsing rows...')
@@ -346,29 +350,3 @@ def parse_schedules(quarter):
         extract_data_from_row(tr, data, curr_state)
     print('Done.')
     return data
-
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print('Usage: parse_schedules.py [QUARTER] [OUTFILE]')
-        sys.exit()
-
-    # extract parameters
-    quarter = sys.argv[1]
-    outfile_name = sys.argv[2]
-
-    # sanity quarter check
-    if quarter not in ['S', 'M1', 'M2', 'F']:
-        print('Requested quarter is not one of [\'S\', \'M1\', \'M2\', \'F\']')
-        sys.exit()
-
-    # parse data
-    data = parse_schedules(quarter)
-
-    # write to output file
-    print('Writing to output file...')
-    try:
-        with open(outfile_name, 'w') as outfile:
-            json.dump(data, outfile)
-            print('Done.')
-    except:
-        print('An error occurred when writing the data to the given file.')

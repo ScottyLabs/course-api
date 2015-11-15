@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# @file cmu-course-api
+# @brief Downloads schedule data for a specific semester, including course
+#        meeting times, course descriptions, pre/corequisites, FCEs, and so on.
+#        Output is parsed into a single JSON output file.
+#
+#        USAGE: cmu-course-api [SEMESTER] [OUTFILE] <USERNAME PASSWORD>
+#
+# @author Justin Gallagher (jrgallag@andrew.cmu.edu)
+# @since 2015-11-08
+
+
+import cmu_course_api
+import json
+import sys
+import getpass
+
+
+# Constants
+USAGE = 'USAGE: cmu-course-api [SEMESTER] [OUTFILE] <USERNAME PASSWORD>'
+
+
+# Verify arguments
+if not (len(sys.argv) == 5 or len(sys.argv) == 3):
+    print(USAGE)
+    sys.exit()
+
+semester = sys.argv[1]
+outpath = sys.argv[2]
+
+if semester not in ['S', 'M1', 'M2', 'F']:
+    print("Requested quarter is not one of ['S', 'M1', 'M2', 'F']")
+    sys.exit()
+
+if (len(sys.argv) == 3):
+    print('Please input your Andrew username and password. '
+          'We never store your login info.')
+    username = input('Username: ')
+    password = getpass.getpass()
+else:
+    username = sys.argv[3]
+    password = sys.argv[4]
+
+# Get the data
+print('Scottylabs CMU Course-API')
+
+print('Getting data...')
+data = cmu_course_api.get_course_data(semester, username, password)
+
+print('Writing data...')
+with open(outpath, 'w') as outfile:
+    json.dump(data, outfile)
+
+print('Done!')

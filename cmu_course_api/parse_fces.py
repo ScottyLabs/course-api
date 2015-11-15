@@ -1,28 +1,17 @@
-#!/usr/bin/env python3
-# @file parse_fces.py
 # @brief Parses FCE data for MSXML files downloaded from
-#        http://cmu.smartevals.com into a JSON file.
+#        http://cmu.smartevals.com.
 #
 #        MSXML is used to compensate for a bug in the FCE export feature: The
 #        first few lines of any output are cut off. MSXML is the only format to
 #        have enough useless metadata at the beginning of the file to prevent
 #        important data from being cutoff.
-#
-#        Usage: python parse_fces.py [OUTFILE] <USERNAME PASSWORD>
-#
-#        OUTFILE: Where to place resulting JSON.
-#        USERNAME: Andrew username to use to download data.
-#        PASSWORD: Andrew password to use to download data.
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2015-01-22
 
-import sys
-import json
 import bs4
 import copy
 import cmu_auth
 import urllib.parse
-import getpass
 import requests
 
 
@@ -196,31 +185,3 @@ def parse_fces(username, password):
 
     # Return as JSON
     return data
-
-
-if __name__ == '__main__':
-    # Verify arguments
-    if not (len(sys.argv) == 4 or len(sys.argv) == 2):
-        print(USAGE)
-        sys.exit()
-
-    outpath = sys.argv[1]
-
-    if (len(sys.argv) == 2):
-        print('Please input your Andrew username and password. '
-              'We never store your login info.')
-        username = input('Username: ')
-        password = getpass.getpass()
-    else:
-        username = sys.argv[2]
-        password = sys.argv[3]
-
-    # Get and write out JSON
-    print('Parsing FCEs. This will take a few minutes...')
-    data = parse_fces(username, password)
-
-    print('Writing data...')
-    with open(outpath, 'w') as outfile:
-        json.dump(data, outfile)
-
-    print('Done!')
