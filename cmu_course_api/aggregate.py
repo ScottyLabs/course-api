@@ -54,5 +54,9 @@ def aggregate(descs, schedules, fces):
 def get_course_data(semester, username, password):
     descs = parse_descs(SOURCES)
     schedules = parse_schedules(semester)
-    fces = parse_fces(username, password)
+    try:
+        fces = parse_fces(username, password)
+    except Exception:
+        fces = []
+        print ("Something went wrong. Running without FCEs for now...")
     return aggregate(descs, schedules, fces)

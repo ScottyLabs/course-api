@@ -7,7 +7,7 @@
 from setuptools import setup
 
 setup(name='cmu-course-api',
-      version='0.1.3',
+      version='0.1.5',
       description=('Python utility for retrieving information about courses at'
                    ' Carnegie Mellon University.'),
       url='http://scottylabs.org/course-api',
@@ -18,6 +18,6 @@ setup(name='cmu-course-api',
       package_data={'cmu_course_api': ['data/*']},
       install_requires=[
         'beautifulsoup4==4.4.1',
-        'cmu_auth==0.1.6'
+        'cmu_auth==0.1.7'
       ],
       scripts=['bin/cmu-course-api'])
