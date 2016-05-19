@@ -58,5 +58,5 @@ def get_course_data(semester, username, password):
         fces = parse_fces(username, password)
     except Exception:
         fces = []
-        print ("Something went wrong. Running without FCEs for now...")
+        print("Something went wrong. Running without FCEs for now...")
     return aggregate(descs, schedules, fces)

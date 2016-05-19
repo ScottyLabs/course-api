@@ -95,18 +95,23 @@ def is_inverted(reqs):
 # @param conj: A string of a conjunction word {'and', 'or'}.
 # @return: 2-dimensional list representation of the prerequisites/corequisites.
 def create_reqs_list(reqs, conj):
-    #separates the requisites into course groups by the given conjunction
+
+    # Separates the requisites into course groups by the given conjunction
     course_groups = split_course_list(reqs, conj)
     anti_conj = 'or' if conj == 'and' else 'and'
     reqs_list = []
+
     for course_group in course_groups:
         inner_list = []
         courses = split_course_list(course_group, anti_conj)
+
         for course in courses:
             formatted_str = course.strip()
             course_num = int(re.sub('\D', '', formatted_str))
             inner_list.append(course_num)
+
         reqs_list.append(inner_list)
+
     return reqs_list
 
 
