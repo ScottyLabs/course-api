@@ -93,8 +93,8 @@ fces       | {}         | All historical FCEs, organized by section. See the [FC
 ### Prerequisites/Corequisites Object Representation:
 
 The fields prereqs_obj and coreqs_obj are object representations of a course's prerequisites/corequisites respectively. Each of these objects has a field "invert", which
-is a boolean, and a field "reqs_list" which is a 2-dimensional list representation of the requisites. If a course does not have any prerequisites/corequisites then the 
-fields of the corresponding object will be null. 
+is a boolean, and a field "reqs_list" which is a 2-dimensional list representation of the requisites. If a course does not have any prerequisites/corequisites then the
+fields of the corresponding object will be null.
 
 Field       | Type       | Description
 ------------|------------|------------
@@ -102,12 +102,12 @@ invert      | Boolean    | Boolean that indicates whether the reqs_list logic is
 reqs_list   | [[int]]    | 2-dimensional list representation of prerequisites/corequisites
 
 In most cases, courses will have requisites with the invert field equal to false, this will be the primary representation. Under the primary representation, the elements
-inside the inner lists operate under 'or' logic while the inner lists with respect to other inner lists operate under 'and' logic. If the invert field is true then the 
-primary representation is reversed. 
+inside the inner lists operate under 'or' logic while the inner lists with respect to other inner lists operate under 'and' logic. If the invert field is true then the
+primary representation is reversed.
 
 ######Invert = false (Primary Representation):
 
-[ [ A ] ]                    => "A" 
+[ [ A ] ]                    => "A"
 
 [ [ A, B ] ]                 => "A or B"
 
