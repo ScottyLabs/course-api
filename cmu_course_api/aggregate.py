@@ -34,6 +34,7 @@ def aggregate(descs, schedules, fces):
                 if ('num' in desc and desc['num'] == int(course['num'])):
                     desc['department'] = department['department']
                     desc['lectures'] = course['lectures']
+                    desc['sections'] = course['sections']
 
                     num = desc['num']
                     del desc['num']
