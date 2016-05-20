@@ -88,9 +88,9 @@ prereqs    | String     | Course prerequisites as a string
 prereqs_obj| Object     | Course prerequisites as an object representation
 coreqs     | String     | Course corequisites as a string
 coreqs_obj | Object     | Course corequisites as an object representation
-lectures   | {}         | Lectures for this semester. See the [Meetings section](#Meetings) for more info.
-sections   | {}         | Sections for this semester. See the [Meetings section](#Meetings) for more info.
-fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#FCEs) for more info.
+lectures   | {}         | Lectures for this semester. See the [Meetings section](#meetings) for more info.
+sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
+fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
 
 ### Prerequisites/Corequisites Object Representation:
 
