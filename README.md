@@ -201,7 +201,7 @@ A meeting has the form:
 Field       | Type      | Description
 ------------|-----------|------------
 instructors | [String]  | List of last names of instructors of the meeting.
-name        | String    | The lecture's identifier. Typically a capital letter or something like "Lec 1".
+name        | String    | The meetings's identifier. Typically a capital letter or something like "Lec 1".
 times       | [time]    | List of meeting times for the meeting. See below for description of a time object.
 
 A time has the form:
