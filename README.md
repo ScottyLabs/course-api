@@ -58,16 +58,17 @@ Scraped data is output in the following form:
     "courses": {
         ...,
         "15122": {
-            "name": "Principles of Imperative Computation"
-            "department": "Computer Science"
-            "units": 10.0
-            "semester": ["F", "S"]
-            "desc": "For students with a basic understanding of programming..."
-            "prereqs": "15-112"
-            "prereqs_obj": {"invert": false, "reqs_list": [[15112]] }
-            "coreqs": "15-151 and 21-127"
-            "coreqs_obj": {"invert": false, "reqs_list": [[21127],[15151]] }
-            "lectures": <Lecture object>
+            "name": "Principles of Imperative Computation",
+            "department": "Computer Science",
+            "units": 10.0,
+            "semester": ["F", "S"],
+            "desc": "For students with a basic understanding of programming...",
+            "prereqs": "15-112",
+            "prereqs_obj": {"invert": false, "reqs_list": [[15112]] },
+            "coreqs": "15-151 and 21-127",
+            "coreqs_obj": {"invert": false, "reqs_list": [[21127],[15151]] },
+            "lectures": <Meeting object>,
+            "sections": <Meeting object>
         },
         ...
     }
@@ -87,8 +88,9 @@ prereqs    | String     | Course prerequisites as a string
 prereqs_obj| Object     | Course prerequisites as an object representation
 coreqs     | String     | Course corequisites as a string
 coreqs_obj | Object     | Course corequisites as an object representation
-lectures   | {}         | Lectures and sections for this semester. See the [Lectures section](#Lectures) for more info.
-fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#FCEs) for more info.
+lectures   | {}         | Lectures for this semester. See the [Meetings section](#meetings) for more info.
+sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
+fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
 
 ### Prerequisites/Corequisites Object Representation:
 
@@ -177,9 +179,9 @@ Output data is formatted as a list of sections, each with their own statistics:
 
 All fields are subject to change depending on how CMU's departments decide to structure their FCEs for a given semester. The fields available and their names are very likely to be different between semesters and departments. Please see https://cmu.smartevals.com/ for the exact format. All keys are column names corresponding to their value. Questions (columns starting with a number) are sorted into their own "Questions" field, with the question as the key and the result as a float value.
 
-### Lectures
+### Meetings
 
-A lecture has the form:
+A meeting has the form:
 
 ```
 {
@@ -187,15 +189,10 @@ A lecture has the form:
         "Kosbie",
         "Andersen"
     ],
-    "lecture": "Lec 1",
-    "meetings": [
+    "name": "Lec 1",
+    "times": [
         ...,
-        <meeting object>,
-        ...
-    ],
-    "sections": [
-        ...,
-        <section object>,
+        <time object>,
         ...
     ]
 }
@@ -203,34 +200,11 @@ A lecture has the form:
 
 Field       | Type      | Description
 ------------|-----------|------------
-instructors | [String]  | List of last names of instructors of the lecture.
-lecture     | String    | The lecture's identifier. Typically a capital letter or something like "Lec 1".
-meetings    | [meeting] | List of meetings for the lecture. See below for description of a meeting object.
-sections    | [section] | List of sections for the lecture. See below for description of a section object.
+instructors | [String]  | List of last names of instructors of the meeting.
+name        | String    | The meetings's identifier. Typically a capital letter or something like "Lec 1".
+times       | [time]    | List of meeting times for the meeting. See below for description of a time object.
 
-A section has the form:
-
-```
-{
-    "instructors": [
-        "Simmons"
-    ],
-    "meetings": [
-        ...,
-        <meeting object>,
-        ...
-    ],
-    "section": "N"
-}
-```
-
-Field       | Type      | Description
-------------|-----------|------------
-instructors | [String]  | List of last names of instructors of the section.
-meetings    | [meeting] | List of meetings for the section. See below for description of a meeting object.
-section     | String    | The section's identifier. Almost always a capital letter.
-
-A meeting has the form:
+A time has the form:
 
 ```
 {

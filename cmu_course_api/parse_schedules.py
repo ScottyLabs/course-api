@@ -200,8 +200,8 @@ def parse_row(row):
         return a dictionary containing the values in lec_sec_data
         '''
         data = {}
-        data['meetings'] = [parse_meeting(lec_sec_data)]
-        data['letter'] = lec_sec_data[3]
+        data['times'] = [parse_meeting(lec_sec_data)]
+        data['name'] = lec_sec_data[3]
         if lec_sec_data[9]:
             data['instructors'] = \
                     [inst for inst in lec_sec_data[9].split(', ')]
@@ -233,6 +233,7 @@ def parse_row(row):
             data['title'] = row[1]
             data['units'] = row[2]
             data['lectures'] = [parse_lec_sec(row)]
+            data['sections'] = []
             return ('course', data)
         # case lecture or section
         elif row[3]:
@@ -271,49 +272,38 @@ def extract_data_from_row(tr, data, curr_state):
                      'courses': curr_state['curr_courses']})
     elif kind == 'course':
         curr_state['curr_course'] = row_data
-        row_data['lectures'][0]['sections'] = []
         # the course determines whether lectures are denoted with 'lec' or
         # letters
-        if not is_lecture(row_data['lectures'][0]['letter'], True):
+        if not is_lecture(row_data['lectures'][0]['name'], True):
             curr_state['is_letter_lecture'] = True
         else:
             curr_state['is_letter_lecture'] = False
             curr_state['curr_lecture'] = row_data['lectures'][0]
         curr_state['curr_lec_sec'] = row_data['lectures'][0]
-        # since this is a lecture, replace the 'letter' key with 'lecture'
-        row_data['lectures'][0]['lecture'] = row_data['lectures'][0]['letter']
-        del row_data['lectures'][0]['letter']
+        curr_state['curr_course']['sections'] = []
+
         # add in course
         curr_state['curr_courses'].append(row_data)
     elif kind == 'lecsec':
         curr_state['curr_lec_sec'] = row_data
+
         # if course is a letter-lecture, then this is for sure another lecture
         if curr_state['is_letter_lecture']:
-            row_data['sections'] = []
-            # replace 'letter' with 'lecture'
-            row_data['lecture'] = row_data['letter']
-            del row_data['letter']
             # add in lecture
             curr_state['curr_course']['lectures'].append(row_data)
+
         # not-letter-lecture
         else:
             # determine if lecture or section
-            if is_lecture(row_data['letter'], False):
-                row_data['sections'] = []
+            if is_lecture(row_data['name'], False):
                 curr_state['curr_lecture'] = row_data
-                # replace 'letter' with 'lecture'
-                row_data['lecture'] = row_data['letter']
-                del row_data['letter']
                 # add in lecture
                 curr_state['curr_course']['lectures'].append(row_data)
             else:
-                # replace 'letter' with 'section'
-                row_data['section'] = row_data['letter']
-                del row_data['letter']
                 # add in section
-                curr_state['curr_lecture']['sections'].append(row_data)
+                curr_state['curr_course']['sections'].append(row_data)
     elif kind == 'meeting':
-        curr_state['curr_lec_sec']['meetings'].append(row_data)
+        curr_state['curr_lec_sec']['times'].append(row_data)
     else:
         raise Exception('Unexpected kind: %s', kind)
 
@@ -340,8 +330,8 @@ def parse_schedules(quarter):
     curr_state = {
         'curr_courses': None,       # where courses should go
         'curr_course': None,        # where lectures should go
-        'curr_lec_sec': None,       # where meetings should go
-        'curr_lecture': None,       # where sections should go
+        'curr_lec_sec': None,       # where meeting times should go
+        'curr_lecture': None,       # where lectures should go
         'is_letter_lecture': False  # whether lectures are denoted by letters
     }
     data = []
