@@ -57,16 +57,16 @@ Scraped data is output in the following form:
 {
     "courses": {
         ...,
-        "15122": {
+        "15-122": {
             "name": "Principles of Imperative Computation",
             "department": "Computer Science",
             "units": 10.0,
             "semester": ["F", "S"],
             "desc": "For students with a basic understanding of programming...",
             "prereqs": "15-112",
-            "prereqs_obj": {"invert": false, "reqs_list": [[15112]] },
+            "prereqs_obj": {"invert": false, "reqs_list": [["15-112"]] },
             "coreqs": "15-151 and 21-127",
-            "coreqs_obj": {"invert": false, "reqs_list": [[21127],[15151]] },
+            "coreqs_obj": {"invert": false, "reqs_list": [["21-127"],["15-151"]] },
             "lectures": <Meeting object>,
             "sections": <Meeting object>
         },
@@ -101,7 +101,7 @@ fields of the corresponding object will be null.
 Field       | Type       | Description
 ------------|------------|------------
 invert      | Boolean    | Boolean that indicates whether the reqs_list logic is inverted or not.
-reqs_list   | [[int]]    | 2-dimensional list representation of prerequisites/corequisites
+reqs_list   | [[String]] | 2-dimensional list representation of prerequisites/corequisites
 
 In most cases, courses will have requisites with the invert field equal to false, this will be the primary representation. Under the primary representation, the elements
 inside the inner lists operate under 'or' logic while the inner lists with respect to other inner lists operate under 'and' logic. If the invert field is true then the
@@ -135,9 +135,9 @@ primary representation is reversed.
 
 ###### Examples:
 
-{"invert": false, "reqs_list": [ [ 15213, 18243 ], [ 18370, 18396 ] ] } => "(15-213 or 18-243) and (18-370 or 18-396)"
+{"invert": false, "reqs_list": [ [ "15-213", "18-243" ], [ "18-370", "18-396" ] ] } => "(15-213 or 18-243) and (18-370 or 18-396)"
 
-{"invert": true,"reqs_list": [ [ 18320, 18300 ], [ 18402 ] ] }          => "(18-320 and 18-300) or 18-402"
+{"invert": true,"reqs_list": [ [ "18-320", "18-300" ], [ "18-402" ] ] }          => "(18-320 and 18-300) or 18-402"
 
 ### FCEs
 
@@ -149,7 +149,7 @@ Output data is formatted as a list of sections, each with their own statistics:
 [
     ...,
     {
-        "Course ID": 12671,
+        "Course ID": "12-671",
         "Course Name": "FND CONCPT COMP CEE",
         "Dept": "CEE",
         "Enrollment": 7,

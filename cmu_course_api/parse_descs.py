@@ -15,11 +15,10 @@ import bs4
 # @brief Extracts the course number and name from a dt element from a
 #        course description webpage.
 # @param dtelement: <dt> element from a course description webpage.
-# @return (num (int), name (string)): The course number and name.
+# @return (num (string), name (string)): The course number and name.
 def extract_num_name(dtelement):
     elements = dtelement.get_text().split(' ', 1)
-    num = int(re.sub('\D', '', elements[0]))
-    return (num, elements[1])
+    return (elements[0], elements[1])
 
 
 # @function extract_units_semester_info
@@ -107,8 +106,7 @@ def create_reqs_list(reqs, conj):
 
         for course in courses:
             formatted_str = course.strip()
-            course_num = int(re.sub('\D', '', formatted_str))
-            inner_list.append(course_num)
+            inner_list.append(formatted_str)
 
         reqs_list.append(inner_list)
 

@@ -147,7 +147,10 @@ def parse_table(table):
 
                 if index < question_start:
                     if cell.data['ss:type'] == 'Number' and value:
-                        value = int(value)
+                        if columns[index] == 'Course ID':
+                            value = value[:2] + '-' + value[2:]
+                        else:
+                            value = int(value)
                     obj[columns[index]] = value
                 else:
                     if value:
