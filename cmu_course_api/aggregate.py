@@ -31,7 +31,7 @@ def aggregate(descs, schedules, fces):
     for department in schedules:
         for course in department['courses']:
             for desc in descs:
-                if ('num' in desc and desc['num'] == int(course['num'])):
+                if ('num' in desc and desc['num'] == course['num']):
                     desc['department'] = department['department']
                     desc['lectures'] = course['lectures']
                     desc['sections'] = course['sections']
@@ -39,7 +39,7 @@ def aggregate(descs, schedules, fces):
                     num = desc['num']
                     del desc['num']
 
-                    courses[str(num)] = desc
+                    courses[num] = desc
 
     return {'courses': courses, 'fces': fces}
 
