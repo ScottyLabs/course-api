@@ -317,7 +317,7 @@ def parse_schedules(quarter):
     '''
     given a quarter, return a Python dictionary representing the data for it
     '''
-    # get the HTML page, fix its errors, and find its table rows
+    # get the HTML page
     print('Requesting the HTML page from the network...')
     page = get_page(quarter)
     if not page:
@@ -325,6 +325,11 @@ def parse_schedules(quarter):
               'Check your internet connection.')
         sys.exit()
     print('Done.')
+
+    # get the semester
+    semester = page.find_all('b')[1].get_text()[10:]
+
+    # fix errors on page and extract rows
     print('Fixing errors on page...')
     fix_known_errors(page)
     print('Done.')
@@ -344,4 +349,4 @@ def parse_schedules(quarter):
     for tr in trs:
         extract_data_from_row(tr, data, curr_state)
     print('Done.')
-    return data
+    return { 'schedules': data, 'semester': semester }

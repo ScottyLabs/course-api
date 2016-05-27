@@ -73,7 +73,8 @@ Scraped data is output in the following form:
         ...
     }
     "fces": <FCEs object>,
-    "rundate": "2016-05-27"
+    "rundate": "2016-05-27",
+    "semester": "Spring 2016"
 }
 ```
 
@@ -93,6 +94,7 @@ lectures   | {}         | Lectures for this semester. See the [Meetings section]
 sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
 fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
 rundate    | String     | Date that this JSON blob was generated in ISO format (YYYY-MM-DD).
+semester   | String     | Semester that this data's schedules represent.
 
 ### Prerequisites/Corequisites Object Representation:
 
