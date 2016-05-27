@@ -214,7 +214,12 @@ def parse_row(row):
         return a dictionary containing the values in meeting_data
         '''
         data = {}
-        data['days'] = meeting_data[4]
+
+        if meeting_data[4] == "TBA":
+            data['days'] = None
+        else:
+            data['days'] = list(meeting_data[4])
+
         data['begin'] = meeting_data[5]
         data['end'] = meeting_data[6]
         data['room'] = meeting_data[7]

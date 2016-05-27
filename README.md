@@ -209,22 +209,23 @@ A time has the form:
 ```
 {
     "begin": "03:30PM",
-    "days": "F",
+    "days": ["F"],
     "end": "04:20PM",
     "location": "Pittsburgh, Pennsylvania",
     "room": "PH 226B"
 }
 ```
 
-Field    | Type   | Description
----------|--------|------------
-begin    | String | The time at which the lecture or section begins.
-days     | String | The days the lecture or section meets at this time, abbreviated and concatenated.
-end      | String | The time at which the lecture or section ends.
-location | String | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
-room     | String | The building and/or room in which the lecture or section meets.
+Field    | Type     | Description
+---------|----------|------------
+begin    | String   | The time at which the lecture or section begins. This field is null if times have not been announced yet.
+days     | [String] | The days the lecture or section meets at this time, in a list of characters. This field is null if times have not been announced yet.
+end      | String   | The time at which the lecture or section ends. This field is null if times have not been announced yet.
+location | String   | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
+room     | String   | The building and/or room in which the lecture or section meets.
 
-Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively.
+Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively
+from Sunday to Saturday.
 
 ## Submitting New Versions
 
