@@ -9,6 +9,7 @@
 
 import json
 import os.path
+from datetime import date
 from cmu_course_api.parse_descs import parse_descs
 from cmu_course_api.parse_schedules import parse_schedules
 from cmu_course_api.parse_fces import parse_fces
@@ -41,7 +42,7 @@ def aggregate(descs, schedules, fces):
 
                     courses[num] = desc
 
-    return {'courses': courses, 'fces': fces}
+    return {'courses': courses, 'fces': fces, 'rundate': str(date.today())}
 
 
 # @function get_course_data

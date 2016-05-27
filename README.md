@@ -72,7 +72,8 @@ Scraped data is output in the following form:
         },
         ...
     }
-    "fces": <FCEs object>
+    "fces": <FCEs object>,
+    "rundate": "2016-05-27"
 }
 ```
 
@@ -91,6 +92,7 @@ coreqs_obj | Object     | Course corequisites as an object representation
 lectures   | {}         | Lectures for this semester. See the [Meetings section](#meetings) for more info.
 sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
 fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
+rundate    | String     | Date that this JSON blob was generated in ISO format (YYYY-MM-DD).
 
 ### Prerequisites/Corequisites Object Representation:
 
