@@ -223,13 +223,10 @@ A time has the form:
 Field    | Type     | Description
 ---------|----------|------------
 begin    | String   | The time at which the lecture or section begins. This field is null if times have not been announced yet.
-days     | [String] | The days the lecture or section meets at this time, in a list of characters. This field is null if times have not been announced yet.
+days     | [int]    | The days the lecture or section meets at this time, in a list of integers. Days are numbered from Sunday (at 0) to Saturday (at 6). This field is null if times have not been announced yet.
 end      | String   | The time at which the lecture or section ends. This field is null if times have not been announced yet.
 location | String   | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
 room     | String   | The building and/or room in which the lecture or section meets.
-
-Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively
-from Sunday to Saturday.
 
 ## Submitting New Versions
 

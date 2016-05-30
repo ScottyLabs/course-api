@@ -209,21 +209,44 @@ def parse_row(row):
             data['instructors'] = None
         return data
 
+    def build_day_list(text):
+        '''
+        Convert string of course days to array of ints
+        '''
+
+        CHAR_INT_MAP = {
+            'U': 0,
+            'M': 1,
+            'T': 2,
+            'W': 3,
+            'R': 4,
+            'F': 5,
+            'S': 6
+        }
+
+        if text == 'TBA':
+            return None
+
+        output = []
+
+        for char in list(text):
+            output.append(CHAR_INT_MAP[char])
+
+        return output
+
     def parse_meeting(meeting_data):
         '''
         return a dictionary containing the values in meeting_data
         '''
+
         data = {}
 
-        if meeting_data[4] == "TBA":
-            data['days'] = None
-        else:
-            data['days'] = list(meeting_data[4])
-
+        data['days'] = build_day_list(meeting_data[4])
         data['begin'] = meeting_data[5]
         data['end'] = meeting_data[6]
         data['room'] = meeting_data[7]
         data['location'] = meeting_data[8]
+
         return data
 
     # the data can be very irregular, so we wrap with try-except
