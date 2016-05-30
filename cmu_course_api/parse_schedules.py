@@ -244,7 +244,15 @@ def parse_row(row):
         data['days'] = build_day_list(meeting_data[4])
         data['begin'] = meeting_data[5]
         data['end'] = meeting_data[6]
-        data['room'] = meeting_data[7]
+
+        if meeting_data[7] == 'TBA':
+            data['building'] = None
+            data['room'] = None
+        else:
+            parts = meeting_data[7].split(' ', 1)
+            data['building'] = parts[0]
+            data['room'] = parts[1]
+
         data['location'] = meeting_data[8]
 
         return data
