@@ -213,7 +213,7 @@ A time has the form:
 ```
 {
     "begin": "03:30PM",
-    "days": ["F"],
+    "days": [1, 3, 5],
     "end": "04:20PM",
     "location": "Pittsburgh, Pennsylvania",
     "room": "PH 226B"
