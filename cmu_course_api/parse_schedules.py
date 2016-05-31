@@ -209,16 +209,52 @@ def parse_row(row):
             data['instructors'] = None
         return data
 
+    def build_day_list(text):
+        '''
+        Convert string of course days to array of ints
+        '''
+
+        CHAR_INT_MAP = {
+            'U': 0,
+            'M': 1,
+            'T': 2,
+            'W': 3,
+            'R': 4,
+            'F': 5,
+            'S': 6
+        }
+
+        if text == 'TBA':
+            return None
+
+        output = []
+
+        for char in list(text):
+            output.append(CHAR_INT_MAP[char])
+
+        return output
+
     def parse_meeting(meeting_data):
         '''
         return a dictionary containing the values in meeting_data
         '''
+
         data = {}
-        data['days'] = meeting_data[4]
+
+        data['days'] = build_day_list(meeting_data[4])
         data['begin'] = meeting_data[5]
         data['end'] = meeting_data[6]
-        data['room'] = meeting_data[7]
+
+        if meeting_data[7] == 'TBA':
+            data['building'] = None
+            data['room'] = None
+        else:
+            parts = meeting_data[7].split(' ', 1)
+            data['building'] = parts[0]
+            data['room'] = parts[1]
+
         data['location'] = meeting_data[8]
+
         return data
 
     # the data can be very irregular, so we wrap with try-except
@@ -312,7 +348,7 @@ def parse_schedules(quarter):
     '''
     given a quarter, return a Python dictionary representing the data for it
     '''
-    # get the HTML page, fix its errors, and find its table rows
+    # get the HTML page
     print('Requesting the HTML page from the network...')
     page = get_page(quarter)
     if not page:
@@ -320,6 +356,11 @@ def parse_schedules(quarter):
               'Check your internet connection.')
         sys.exit()
     print('Done.')
+
+    # get the semester
+    semester = page.find_all('b')[1].get_text()[10:]
+
+    # fix errors on page and extract rows
     print('Fixing errors on page...')
     fix_known_errors(page)
     print('Done.')
@@ -339,4 +380,4 @@ def parse_schedules(quarter):
     for tr in trs:
         extract_data_from_row(tr, data, curr_state)
     print('Done.')
-    return data
+    return { 'schedules': data, 'semester': semester }

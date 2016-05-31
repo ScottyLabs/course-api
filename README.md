@@ -72,7 +72,9 @@ Scraped data is output in the following form:
         },
         ...
     }
-    "fces": <FCEs object>
+    "fces": <FCEs object>,
+    "rundate": "2016-05-27",
+    "semester": "Spring 2016"
 }
 ```
 
@@ -91,6 +93,8 @@ coreqs_obj | Object     | Course corequisites as an object representation
 lectures   | {}         | Lectures for this semester. See the [Meetings section](#meetings) for more info.
 sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
 fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
+rundate    | String     | Date that this JSON blob was generated in ISO format (YYYY-MM-DD).
+semester   | String     | Semester that this data's schedules represent.
 
 ### Prerequisites/Corequisites Object Representation:
 
@@ -209,22 +213,22 @@ A time has the form:
 ```
 {
     "begin": "03:30PM",
-    "days": "F",
+    "days": [1, 3, 5],
     "end": "04:20PM",
     "location": "Pittsburgh, Pennsylvania",
-    "room": "PH 226B"
+    "building": "PH",
+    "room": "226B"
 }
 ```
 
-Field    | Type   | Description
----------|--------|------------
-begin    | String | The time at which the lecture or section begins.
-days     | String | The days the lecture or section meets at this time, abbreviated and concatenated.
-end      | String | The time at which the lecture or section ends.
-location | String | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
-room     | String | The building and/or room in which the lecture or section meets.
-
-Note that the days of the week are abbreviated as U,M,T,W,R,F,S respectively.
+Field    | Type     | Description
+---------|----------|------------
+begin    | String   | The time at which the lecture or section begins. This field is null if times have not been announced yet.
+days     | [int]    | The days the lecture or section meets at this time, in a list of integers. Days are numbered from Sunday (at 0) to Saturday (at 6). This field is null if times have not been announced yet.
+end      | String   | The time at which the lecture or section ends. This field is null if times have not been announced yet.
+location | String   | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
+building | String   | The building in which the lecture or section meets. Null if the meeting location is TBA.
+room     | String   | The room in which the meeting is held. Null if the meeting location is TBA.
 
 ## Submitting New Versions
 

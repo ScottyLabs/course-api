@@ -9,6 +9,7 @@
 
 import json
 import os.path
+from datetime import date
 from cmu_course_api.parse_descs import parse_descs
 from cmu_course_api.parse_schedules import parse_schedules
 from cmu_course_api.parse_fces import parse_fces
@@ -28,7 +29,7 @@ SOURCES = os.path.join(os.path.dirname(__file__), 'data/schedule_pages.txt')
 def aggregate(descs, schedules, fces):
     courses = {}
 
-    for department in schedules:
+    for department in schedules['schedules']:
         for course in department['courses']:
             for desc in descs:
                 if ('num' in desc and desc['num'] == course['num']):
@@ -41,7 +42,8 @@ def aggregate(descs, schedules, fces):
 
                     courses[num] = desc
 
-    return {'courses': courses, 'fces': fces}
+    return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
+            'semester': schedules['semester']}
 
 
 # @function get_course_data
@@ -59,5 +61,5 @@ def get_course_data(semester, username, password):
         fces = parse_fces(username, password)
     except Exception:
         fces = []
-        print("Something went wrong. Running without FCEs for now...")
+        print('Something went wrong. Running without FCEs for now...')
     return aggregate(descs, schedules, fces)
