@@ -303,11 +303,12 @@ def extract_data_from_row(tr, data, curr_state):
     (kind, row_data) = parse_row(process_row(tr))
     # determine whether to store the dictionary, and update curr_state
     if kind == 'department':
-        curr_state['curr_courses'] = []
-        data.append({'department': row_data,
-                     'courses': curr_state['curr_courses']})
+        curr_state['curr_department'] = row_data
+
     elif kind == 'course':
         curr_state['curr_course'] = row_data
+        curr_state['curr_course']['department'] = curr_state['curr_department']
+
         # the course determines whether lectures are denoted with 'lec' or
         # letters
         if not is_lecture(row_data['lectures'][0]['name'], True):
@@ -318,8 +319,8 @@ def extract_data_from_row(tr, data, curr_state):
         curr_state['curr_lec_sec'] = row_data['lectures'][0]
         curr_state['curr_course']['sections'] = []
 
-        # add in course
-        curr_state['curr_courses'].append(row_data)
+        data.append(curr_state['curr_course'])
+
     elif kind == 'lecsec':
         curr_state['curr_lec_sec'] = row_data
 
@@ -338,8 +339,10 @@ def extract_data_from_row(tr, data, curr_state):
             else:
                 # add in section
                 curr_state['curr_course']['sections'].append(row_data)
+
     elif kind == 'meeting':
         curr_state['curr_lec_sec']['times'].append(row_data)
+
     else:
         raise Exception('Unexpected kind: %s', kind)
 
@@ -369,10 +372,10 @@ def parse_schedules(quarter):
     print('Done.')
     # parse each row and insert it into 'data' as appropriate
     curr_state = {
-        'curr_courses': None,       # where courses should go
-        'curr_course': None,        # where lectures should go
+        'curr_course': None,        # where the course should go
         'curr_lec_sec': None,       # where meeting times should go
         'curr_lecture': None,       # where lectures should go
+        'curr_department': None,    # where the department should go
         'is_letter_lecture': False  # whether lectures are denoted by letters
     }
     data = []

@@ -29,18 +29,17 @@ SOURCES = os.path.join(os.path.dirname(__file__), 'data/schedule_pages.txt')
 def aggregate(descs, schedules, fces):
     courses = {}
 
-    for department in schedules['schedules']:
-        for course in department['courses']:
-            for desc in descs:
-                if ('num' in desc and desc['num'] == course['num']):
-                    desc['department'] = department['department']
-                    desc['lectures'] = course['lectures']
-                    desc['sections'] = course['sections']
+    for course in schedules['schedules']:
+        for desc in descs:
+            if ('num' in desc and desc['num'] == course['num']):
+                desc['department'] = course['department']
+                desc['lectures'] = course['lectures']
+                desc['sections'] = course['sections']
 
-                    num = desc['num']
-                    del desc['num']
+                num = desc['num']
+                del desc['num']
 
-                    courses[num] = desc
+                courses[num] = desc
 
     return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
             'semester': schedules['semester']}
