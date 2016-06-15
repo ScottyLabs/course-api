@@ -11,7 +11,7 @@ Schedule of Classes, and the site for FCEs.
 The Scottylabs Course API is now available as a pip package! All you need to do to install is run:
 
 ```
-$ pip install cmu-course-api
+$ pip3 install cmu-course-api
 ```
 
 ## Usage
