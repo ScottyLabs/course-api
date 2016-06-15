@@ -83,8 +83,7 @@ Field      | Type       | Description
 courses    | {}         | Object containing course information, with course numbers as keys
 name       | String     | Course name
 department | String     | Department name
-units      | float      | Units awarded by course
-semester   | [String]   | List of semesters where the course is offered ("F" = Fall, "S" = Spring, "M" = Summer)
+units      | float      | Units awarded by course. Null if the number of units is not specified or variable (common for independent study)
 desc       | String     | Course description
 prereqs    | String     | Course prerequisites as a string
 prereqs_obj| Object     | Course prerequisites as an object representation
