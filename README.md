@@ -61,7 +61,6 @@ Scraped data is output in the following form:
             "name": "Principles of Imperative Computation",
             "department": "Computer Science",
             "units": 10.0,
-            "semester": ["F", "S"],
             "desc": "For students with a basic understanding of programming...",
             "prereqs": "15-112",
             "prereqs_obj": {"invert": false, "reqs_list": [["15-112"]] },
