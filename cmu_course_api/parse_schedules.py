@@ -265,7 +265,7 @@ def parse_row(row):
         # case course (determined by having a numeric course)
         elif row[0] and row[0].isdigit():
             data = {}
-            data['num'] = row[0][:2] + '-' + row[0][2:]
+            data['num'] = row[0]
             data['title'] = row[1]
             data['units'] = row[2]
             data['lectures'] = [parse_lec_sec(row)]
@@ -383,4 +383,8 @@ def parse_schedules(quarter):
     for tr in trs:
         extract_data_from_row(tr, data, curr_state)
     print('Done.')
-    return { 'schedules': data, 'semester': semester }
+
+    return {
+        'schedules': data,
+        'semester': semester
+    }
