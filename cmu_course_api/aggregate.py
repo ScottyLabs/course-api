@@ -14,6 +14,11 @@ from cmu_course_api.parse_descs import get_course_desc
 from cmu_course_api.parse_schedules import parse_schedules
 from cmu_course_api.parse_fces import parse_fces
 
+# imports used for multithreading
+import threading
+from queue import Queue
+from os import cpu_count
+
 
 # Constants
 SOURCES = os.path.join(os.path.dirname(__file__), 'data/schedule_pages.txt')
@@ -37,25 +42,57 @@ def aggregate(schedules, fces):
     semester = SEMESTER_ABBREV[semester]
     year = schedules['semester'].split(' ')[-1][2:]
 
+    count = cpu_count()
+    lock = threading.Lock()
+    isDone = False
+    isDoneLock = threading.Lock()
+    queue = Queue()
+
+    if count is None:
+        count = 4
+
+    print("running on " + str(count) + " threads")
+
+    def run():
+        while True:
+            try:
+                course = queue.get(timeout=4)
+                print('Getting description for ' + course['num'] + '...')
+
+                desc = get_course_desc(course['num'], semester, year)
+                desc['name'] = course['title']
+
+                try:
+                    desc['units'] = float(course['units'])
+                except ValueError:
+                    desc['units'] = None
+
+                desc['department'] = course['department']
+                desc['lectures'] = course['lectures']
+                desc['sections'] = course['sections']
+
+                number = course['num'][:2] + '-' + course['num'][2:]
+                with lock:
+                    courses[number] = desc
+                queue.task_done()
+
+            except:
+                with isDoneLock:
+                    if isDone:
+                        return
+
+    for _ in range(count):
+        thread = threading.Thread(target=run)
+        thread.setDaemon(True)
+        thread.start()
+
     for course in schedules['schedules']:
+        queue.put(course)
 
-        print('Getting description for ' + course['num'] + '...')
+    queue.join()
 
-        desc = get_course_desc(course['num'], semester, year)
-        desc['name'] = course['title']
-
-        try:
-            desc['units'] = float(course['units'])
-        except ValueError:
-            desc['units'] = None
-
-        desc['department'] = course['department']
-        desc['lectures'] = course['lectures']
-        desc['sections'] = course['sections']
-
-        number = course['num'][:2] + '-' + course['num'][2:]
-
-        courses[number] = desc
+    with isDoneLock:
+        isDone = True
 
     return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
             'semester': schedules['semester']}
