@@ -6,13 +6,18 @@
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2015-04-07
 
-
 import json
 import os.path
 from datetime import date
 from cmu_course_api.parse_descs import get_course_desc
 from cmu_course_api.parse_schedules import parse_schedules
 from cmu_course_api.parse_fces import parse_fces
+
+# imports used for multithreading
+import threading
+from queue import Queue
+from os import cpu_count
+from queue import Empty
 
 
 # Constants
@@ -37,25 +42,49 @@ def aggregate(schedules, fces):
     semester = SEMESTER_ABBREV[semester]
     year = schedules['semester'].split(' ')[-1][2:]
 
+    count = cpu_count()
+    lock = threading.Lock()
+    queue = Queue()
+
+    if count is None:
+        count = 4
+
+    def run():
+        while True:
+            try:
+                course = queue.get(timeout=4)
+            except Empty:
+                return
+
+            print('Getting description for ' + course['num'] + '...')
+
+            desc = get_course_desc(course['num'], semester, year)
+            desc['name'] = course['title']
+
+            try:
+                desc['units'] = float(course['units'])
+            except ValueError:
+                desc['units'] = None
+
+            desc['department'] = course['department']
+            desc['lectures'] = course['lectures']
+            desc['sections'] = course['sections']
+
+            number = course['num'][:2] + '-' + course['num'][2:]
+            with lock:
+                courses[number] = desc
+            queue.task_done()
+
     for course in schedules['schedules']:
+        queue.put(course)
 
-        print('Getting description for ' + course['num'] + '...')
+    print("running on " + str(count) + " threads")
+    for _ in range(count):
+        thread = threading.Thread(target=run)
+        thread.setDaemon(True)
+        thread.start()
 
-        desc = get_course_desc(course['num'], semester, year)
-        desc['name'] = course['title']
-
-        try:
-            desc['units'] = float(course['units'])
-        except ValueError:
-            desc['units'] = None
-
-        desc['department'] = course['department']
-        desc['lectures'] = course['lectures']
-        desc['sections'] = course['sections']
-
-        number = course['num'][:2] + '-' + course['num'][2:]
-
-        courses[number] = desc
+    queue.join()
 
     return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
             'semester': schedules['semester']}
