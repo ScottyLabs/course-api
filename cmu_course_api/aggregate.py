@@ -53,36 +53,37 @@ def aggregate(schedules, fces):
         while True:
             try:
                 course = queue.get(timeout=4)
-                print('Getting description for ' + course['num'] + '...')
-
-                desc = get_course_desc(course['num'], semester, year)
-                desc['name'] = course['title']
-
-                try:
-                    desc['units'] = float(course['units'])
-                except ValueError:
-                    desc['units'] = None
-
-                desc['department'] = course['department']
-                desc['lectures'] = course['lectures']
-                desc['sections'] = course['sections']
-
-                number = course['num'][:2] + '-' + course['num'][2:]
-                with lock:
-                    courses[number] = desc
-                queue.task_done()
             except Empty:
                 return
+
+            print('Getting description for ' + course['num'] + '...')
+
+            desc = get_course_desc(course['num'], semester, year)
+            desc['name'] = course['title']
+
+            try:
+                desc['units'] = float(course['units'])
+            except ValueError:
+                desc['units'] = None
+
+            desc['department'] = course['department']
+            desc['lectures'] = course['lectures']
+            desc['sections'] = course['sections']
+
+            number = course['num'][:2] + '-' + course['num'][2:]
+            with lock:
+                courses[number] = desc
+            queue.task_done()
 
     for course in schedules['schedules']:
         queue.put(course)
 
+    print("running on " + str(count) + " threads")
     for _ in range(count):
         thread = threading.Thread(target=run)
         thread.setDaemon(True)
         thread.start()
 
-    print("running on " + str(count) + " threads")
     queue.join()
 
     return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
