@@ -6,7 +6,6 @@
 # @author Justin Gallagher (jrgallag@andrew.cmu.edu)
 # @since 2015-04-07
 
-
 import json
 import os.path
 from datetime import date
@@ -18,6 +17,7 @@ from cmu_course_api.parse_fces import parse_fces
 import threading
 from queue import Queue
 from os import cpu_count
+from queue import Empty
 
 
 # Constants
@@ -44,14 +44,10 @@ def aggregate(schedules, fces):
 
     count = cpu_count()
     lock = threading.Lock()
-    isDone = False
-    isDoneLock = threading.Lock()
     queue = Queue()
 
     if count is None:
         count = 4
-
-    print("running on " + str(count) + " threads")
 
     def run():
         while True:
@@ -75,24 +71,19 @@ def aggregate(schedules, fces):
                 with lock:
                     courses[number] = desc
                 queue.task_done()
+            except Empty:
+                return
 
-            except:
-                with isDoneLock:
-                    if isDone:
-                        return
+    for course in schedules['schedules']:
+        queue.put(course)
 
     for _ in range(count):
         thread = threading.Thread(target=run)
         thread.setDaemon(True)
         thread.start()
 
-    for course in schedules['schedules']:
-        queue.put(course)
-
+    print("running on " + str(count) + " threads")
     queue.join()
-
-    with isDoneLock:
-        isDone = True
 
     return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
             'semester': schedules['semester']}
