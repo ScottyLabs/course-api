@@ -112,35 +112,49 @@ def parse_reqs(soup):
 
 
 # @function parse_full_names
-# 
-# @brief      { function_description }
-#
+# @brief      Obtains full names of instructors.
 # @param      soup  BeautifulSoup of the page's HTML.
-#
-# @return     (str list dict) Dictionary of list of names.
+# @return     {<section>: [<name>]} Dictionary of list of names.
 #
 def parse_full_names(soup):
     dict_of_names = {}
-    # try:
-    for ultag in soup.find_all('ul', class_='instructor'):
-        names = []
-        section = ultag.parent.parent.find_all('td',
-                                               recursive=False)[2].text.strip()
-        # print(section)
-        for litag in ultag.find_all('li'):
-            names.append(litag.text)
-        if names == []:
-            names = ['Instructor TBA']
-        if section:
-            dict_of_names[section] = names
-    # Fix the discrepancy between SOC table and the SOC api
-    # if there's only one lecture, then
-    # dict_of_names['Lec'] is dict_of_names['Lec 1']
-    if 'Lec 1' in dict_of_names:
-        dict_of_names['Lec'] = dict_of_names['Lec 1']
 
-    # except Exception as e:
-    #     pass
+    # Determine the column for Section.
+    # Usually, column=2 for S(spring) and F(fall) and column=3 for M(summer).
+    column = 2
+    try:
+        thtags = soup.find_all('table', class_='table-striped')[0]\
+            .select('thead > tr > th')
+
+        for i in range(len(thtags)):
+            if thtags[i].text == 'Section':
+                break
+        column = i
+    except:
+        pass
+
+    # Parse the names from the web page.
+    try:
+        for ultag in soup.find_all('ul', class_='instructor'):
+            # Get the section this list of names belongs to
+            section = ultag.parent.parent.find_all('td', recursive=False)[column]\
+                .text.strip()
+
+            # Put all the names into a list
+            names = [litag.text for litag in ultag.find_all('li')]
+            if names == []:
+                names = ['Instructor TBA']
+            if section:
+                dict_of_names[section] = names
+
+        # Fix the discrepancy between SOC table and the SOC api
+        # if there's only one lecture, then
+        # dict_of_names['Lec'] is dict_of_names['Lec 1']
+        if 'Lec 1' in dict_of_names:
+            dict_of_names['Lec'] = dict_of_names['Lec 1']
+    except TypeError:
+        pass
+
     return dict_of_names
 
 
