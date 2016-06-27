@@ -70,9 +70,14 @@ def aggregate(schedules, fces):
             desc['lectures'] = course['lectures']
             desc['sections'] = course['sections']
             names_dict = desc.pop('names_dict', {})
-            for lec in desc['lectures']:
-                if lec['name'] in names_dict:
-                    lec['instructors'] = names_dict[lec['name']]
+
+            for key in ('lectures', 'sections'):
+                for meeting in desc[key]:
+                    if meeting['name'] in names_dict:
+                        meeting['instructors'] = names_dict[meeting['name']]
+            print(names_dict)
+            print(desc['lectures'])
+            print(desc['sections'])
 
             number = course['num'][:2] + '-' + course['num'][2:]
             with lock:
