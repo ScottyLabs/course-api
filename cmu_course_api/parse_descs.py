@@ -111,6 +111,39 @@ def parse_reqs(soup):
     return (prereqs, coreqs)
 
 
+# @function parse_full_names
+# 
+# @brief      { function_description }
+#
+# @param      soup  BeautifulSoup of the page's HTML.
+#
+# @return     (str list dict) Dictionary of list of names.
+#
+def parse_full_names(soup):
+    dict_of_names = {}
+    # try:
+    for ultag in soup.find_all('ul', class_='instructor'):
+        names = []
+        section = ultag.parent.parent.find_all('td',
+                                               recursive=False)[2].text.strip()
+        # print(section)
+        for litag in ultag.find_all('li'):
+            names.append(litag.text)
+        if names == []:
+            names = ['Instructor TBA']
+        if section:
+            dict_of_names[section] = names
+    # Fix the discrepancy between SOC table and the SOC api
+    # if there's only one lecture, then
+    # dict_of_names['Lec'] is dict_of_names['Lec 1']
+    if 'Lec 1' in dict_of_names:
+        dict_of_names['Lec'] = dict_of_names['Lec 1']
+
+    # except Exception as e:
+    #     pass
+    return dict_of_names
+
+
 # @function get_page
 # @brief Gets a webpage as an object
 # @param url: URL of the page to get.
@@ -152,6 +185,7 @@ def get_course_desc(num, semester, year):
     # Parse data
     desc = soup.find(id='course-detail-description').p.string
     (prereqs, coreqs) = parse_reqs(soup)
+    names_dict = parse_full_names(soup)
 
     prereqs_obj = create_reqs_obj(prereqs)
     coreqs_obj = create_reqs_obj(coreqs)
@@ -161,5 +195,6 @@ def get_course_desc(num, semester, year):
         'prereqs': prereqs,
         'prereqs_obj': prereqs_obj,
         'coreqs': coreqs,
-        'coreqs_obj': coreqs_obj
+        'coreqs_obj': coreqs_obj,
+        'names_dict': names_dict
     }

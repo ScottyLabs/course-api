@@ -69,6 +69,10 @@ def aggregate(schedules, fces):
             desc['department'] = course['department']
             desc['lectures'] = course['lectures']
             desc['sections'] = course['sections']
+            names_dict = desc.pop('names_dict', {})
+            for lec in desc['lectures']:
+                if lec['name'] in names_dict:
+                    lec['instructors'] = names_dict[lec['name']]
 
             number = course['num'][:2] + '-' + course['num'][2:]
             with lock:
