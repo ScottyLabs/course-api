@@ -188,8 +188,8 @@ A meeting has the form:
 ```
 {
     "instructors": [
-        "Kosbie",
-        "Andersen"
+        "Kosbie, David",
+        "Andersen, David"
     ],
     "name": "Lec 1",
     "times": [
@@ -202,7 +202,7 @@ A meeting has the form:
 
 Field       | Type      | Description
 ------------|-----------|------------
-instructors | [String]  | List of last names of instructors of the meeting.
+instructors | [String]  | List of names of instructors of the meeting. A name is formated as "Last, First".
 name        | String    | The meetings's identifier. Typically a capital letter or something like "Lec 1".
 times       | [time]    | List of meeting times for the meeting. See below for description of a time object.
 
