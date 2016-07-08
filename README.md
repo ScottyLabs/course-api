@@ -20,23 +20,18 @@ To use from the command line, run:
 
 ```
 $ cmu-course-api [SEMESTER] [OUTFILE]
-$ cmu-course-api [SEMESTER] [OUTFILE] <USERNAME> <PASSWORD>
 ```
 
 `SEMESTER` is the school semester for which you wish to retrieve scheduling data. It must be one of S, M1, M2, or F.
 
 `OUTFILE` is a path to write the output JSON to.
 
-`USERNAME` is the Andrew username used for authentication. If not specified, you will be prompted to input one.
-
-`PASSWORD` is the Andrew password used for authentication. If not specified, you will be prompted to input one.
-
 Alternatively, you can use the course API in your Python 3 projects:
 
 ```python
 import cmu_course_api
 
-data = cmu_course_api.get_course_data(semester, username, password)
+data = cmu_course_api.get_course_data(semester)
 ```
 
 Then, `data` will contain the course information as a Python object.
@@ -70,8 +65,7 @@ Scraped data is output in the following form:
             "sections": <Meeting object>
         },
         ...
-    }
-    "fces": <FCEs object>,
+    },
     "rundate": "2016-05-27",
     "semester": "Spring 2016"
 }
@@ -90,7 +84,6 @@ coreqs     | String     | Course corequisites as a string
 coreqs_obj | Object     | Course corequisites as an object representation
 lectures   | {}         | Lectures for this semester. See the [Meetings section](#meetings) for more info.
 sections   | {}         | Sections for this semester. See the [Meetings section](#meetings) for more info.
-fces       | {}         | All historical FCEs, organized by section. See the [FCEs section](#fces) for more info.
 rundate    | String     | Date that this JSON blob was generated in ISO format (YYYY-MM-DD).
 semester   | String     | Semester that this data's schedules represent.
 
