@@ -36,7 +36,7 @@ data = cmu_course_api.get_course_data(semester)
 
 Then, `data` will contain the course information as a Python object.
 
-See [Course output format][#course-output-format] for details.
+See [Course output format](#course-output-format) for details.
 
 ## FCEs Usage
 
@@ -62,7 +62,7 @@ fces = cmu_course_api.parse_fces(csvpath)
 
 Then `fces` will contain the FCE data in the file `csvpath`.
 
-See [FCE output format][#fce-output-format] for details.
+See [FCE output format](#fce-output-format) for details.
 
 ## Minification
 
