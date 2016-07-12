@@ -31,7 +31,7 @@ folder = sys.argv[1]
 outpath = sys.argv[2]
 
 # Get list of files to process
-files = [f for f in listdir(folder) if isfile(join(folder, f))]
+files = [join(folder, f) for f in listdir(folder) if isfile(join(folder, f))]
 
 # Get data
 print('Scottylabs CMU Course-API')
@@ -39,7 +39,11 @@ print('Parsing FCE information...')
 data = []
 
 for csv in files:
+    print('\tProcessing ' + str(csv) + '...')
     data.append(cmu_course_api.parse_fces(csv))
+
+# Flatten the list
+data = [item for lst in data for item in lst]
 
 print('Writing data...')
 with open(outpath, 'w') as outfile:
