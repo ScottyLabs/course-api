@@ -14,9 +14,9 @@ The Scottylabs Course API is now available as a pip package! All you need to do 
 $ pip3 install cmu-course-api
 ```
 
-## Usage
+## Course Schedules & Descriptions Usage
 
-To use from the command line, run:
+To get course schedules and descriptions from the command line, run:
 
 ```
 $ cmu-course-api [SEMESTER] [OUTFILE]
@@ -36,6 +36,34 @@ data = cmu_course_api.get_course_data(semester)
 
 Then, `data` will contain the course information as a Python object.
 
+See [Course output format][#course-output-format] for details.
+
+## FCEs Usage
+
+To parse FCE data, download the relevant data set from the [CMU FCE website](https://cmu.smartevals.com) by logging in, clicking "See Results from Past Years", then the Excel icon at the lop left of the table. Make sure to choose CSV format. Place all files at the top level of a folder.
+
+Parse the data by running the following from the command line:
+
+```
+$ cmu-fce-api [FOLDER] [OUTFILE]
+```
+
+`FOLDER` is the folder containing CSV files to parse.
+
+`OUTFILE` is a path to write the output JSON to.
+
+Alternatively, you can use the FCE API in your Python 3 projects:
+
+```python
+import cmu_course_api
+
+fces = cmu_course_api.parse_fces(csvpath)
+```
+
+Then `fces` will contain the FCE data in the file `csvpath`.
+
+See [FCE output format][#fce-output-format] for details.
+
 ## Minification
 
 By default, all output data is stored as a minified JSON file. To get human readable JSON, use the command (for output file `out.json`):
@@ -44,7 +72,7 @@ By default, all output data is stored as a minified JSON file. To get human read
 $ python -m json.tool out.json
 ```
 
-## Output format
+## Course output format
 
 Scraped data is output in the following form:
 
@@ -134,46 +162,6 @@ primary representation is reversed.
 
 {"invert": true,"reqs_list": [ [ "18-320", "18-300" ], [ "18-402" ] ] }          => "(18-320 and 18-300) or 18-402"
 
-### FCEs
-
-Beware that any field below may have `null` instead of the expected value.
-
-Output data is formatted as a list of sections, each with their own statistics:
-
-```
-[
-    ...,
-    {
-        "Course ID": "12-671",
-        "Course Name": "FND CONCPT COMP CEE",
-        "Dept": "CEE",
-        "Enrollment": 7,
-        "Instructor": "FINGER, S.",
-        "Resp. Rate %": "71%",
-        "Responses": 5,
-        "Section": "A3",
-        "Semester": "Spring",
-        "Type": "Lect",
-        "Year": 2015,
-        "Questions": {
-            "1: Hrs Per Week 9": 10.0,
-            "2: Interest in student learning": 4.8,
-            "3: Explain course requirements": 4.4,
-            "4: Clear learning goals": 4.4,
-            "5: Feedback to students": 5.0,
-            "6: Importance of subject": 4.4,
-            "7: Explains subject matter": 4.8,
-            "8: Show respect for students": 5.0,
-            "9: Overall teaching": 4.8
-            "10: Overall course": 4.6,
-        }
-    },
-    ...
-]
-```
-
-All fields are subject to change depending on how CMU's departments decide to structure their FCEs for a given semester. The fields available and their names are very likely to be different between semesters and departments. Please see https://cmu.smartevals.com/ for the exact format. All keys are column names corresponding to their value. Questions (columns starting with a number) are sorted into their own "Questions" field, with the question as the key and the result as a float value.
-
 ### Meetings
 
 A meeting has the form:
@@ -220,6 +208,47 @@ end      | String   | The time at which the lecture or section ends. This field 
 location | String   | The location of the lecture or section's meeting. Probably Pittsburgh, Pennsylvania or Doha, Qatar.
 building | String   | The building in which the lecture or section meets. Null if the meeting location is TBA.
 room     | String   | The room in which the meeting is held. Null if the meeting location is TBA.
+
+## FCE output format
+
+Beware that any field below may have `null` instead of the expected value.
+
+Output data is formatted as a list of sections, each with their own statistics:
+
+```
+[
+    ...,
+    {
+        "Course ID": "12-671",
+        "Course Name": "FND CONCPT COMP CEE",
+        "Dept": "CEE",
+        "Enrollment": 7,
+        "Instructor": "FINGER, S.",
+        "Resp. Rate %": "71%",
+        "Responses": 5,
+        "Section": "A3",
+        "Semester": "Spring",
+        "Type": "Lect",
+        "Year": 2015,
+        "Questions": {
+            "1: Hrs Per Week 9": 10.0,
+            "2: Interest in student learning": 4.8,
+            "3: Explain course requirements": 4.4,
+            "4: Clear learning goals": 4.4,
+            "5: Feedback to students": 5.0,
+            "6: Importance of subject": 4.4,
+            "7: Explains subject matter": 4.8,
+            "8: Show respect for students": 5.0,
+            "9: Overall teaching": 4.8
+            "10: Overall course": 4.6,
+        }
+    },
+    ...
+]
+```
+
+All fields are subject to change depending on how CMU's departments decide to structure their FCEs for a given semester. The fields available and their names are very likely to be different between semesters and departments. Please see https://cmu.smartevals.com/ for the exact format. All keys are column names corresponding to their value. Questions (columns starting with a number) are sorted into their own "Questions" field, with the question as the key and the result as a float value.
+
 
 ## Submitting New Versions
 
