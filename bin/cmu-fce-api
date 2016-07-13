@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+# @file cmu-fce-api
+# @brief Parses downloaded FCE data CSVs into JSON.
+#
+#        Data should be downloaded from cmu.smartevals.com as CSV, and placed
+#        in the top level of the passed folder.
+#
+#        USAGE: cmu-fce-api [FCE FOLDER] [OUTFILE]
+#
+# @author Justin Gallagher (jrgallag@andrew.cmu.edu)
+# @since 2016-07-11
+
+
+import cmu_course_api
+import json
+import sys
+from os import listdir
+from os.path import isfile, join
+
+
+# Constants
+USAGE = 'USAGE: cmu-fce-api [FCE FOLDER] [OUTFILE]'
+
+
+# Verify arguments
+if not (len(sys.argv) == 3):
+    print(USAGE)
+    sys.exit()
+
+folder = sys.argv[1]
+outpath = sys.argv[2]
+
+# Get list of files to process
+files = [join(folder, f) for f in listdir(folder) if isfile(join(folder, f))]
+
+# Get data
+print('Scottylabs CMU Course-API')
+print('Parsing FCE information...')
+data = []
+
+for csv in files:
+    print('\tProcessing ' + str(csv) + '...')
+    data.append(cmu_course_api.parse_fces(csv))
+
+# Flatten the list
+data = [item for lst in data for item in lst]
+
+print('Writing data...')
+with open(outpath, 'w') as outfile:
+    json.dump(data, outfile)
+
+print('Done!')

@@ -11,7 +11,6 @@ import os.path
 from datetime import date
 from cmu_course_api.parse_descs import get_course_desc
 from cmu_course_api.parse_schedules import parse_schedules
-from cmu_course_api.parse_fces import parse_fces
 
 # imports used for multithreading
 import threading
@@ -30,12 +29,10 @@ SEMESTER_ABBREV = {
 
 
 # @function aggregate
-# @brief Combines the course descriptions, schedules, and FCEs data sets into
-#        one object.
+# @brief Combines the course descriptions and schedules into one object.
 # @param schedules: Course schedules object as returned by parse_descs.
-# @param fces: FCEs object as returned by parse_descs.
 # @return An object containing the aggregate of the three datasets.
-def aggregate(schedules, fces):
+def aggregate(schedules):
     courses = {}
 
     semester = schedules['semester'].split(' ')[0]
@@ -92,7 +89,7 @@ def aggregate(schedules, fces):
 
     queue.join()
 
-    return {'courses': courses, 'fces': fces, 'rundate': str(date.today()),
+    return {'courses': courses, 'rundate': str(date.today()),
             'semester': schedules['semester']}
 
 
@@ -100,15 +97,8 @@ def aggregate(schedules, fces):
 # @brief Used for retrieving all information from the course-api for a given
 #        semester.
 # @param semester: The semester to get data for. Must be one of [S, M1, M2, F].
-# @param username: Username to use for andrew authentication.
-# @param password: Password to use for andrew authentication.
 # @return Object containing all course-api data - see README.md for more
 #        information.
-def get_course_data(semester, username, password):
+def get_course_data(semester):
     schedules = parse_schedules(semester)
-    try:
-        fces = parse_fces(username, password)
-    except Exception:
-        fces = []
-        print('Something went wrong. Running without FCEs for now...')
-    return aggregate(schedules, fces)
+    return aggregate(schedules)
