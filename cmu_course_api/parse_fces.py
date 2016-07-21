@@ -10,6 +10,7 @@
 
 
 import csv
+import re
 
 
 # @function parse_fces
@@ -45,14 +46,30 @@ def parse_fces(path):
 
                 # Ensure course IDs have the proper format (##-###)
                 if categories[cat] == 'Course ID' and line[cat] != None:
-                    num = line[cat]
-                    if len(num) == 4:
-                        num = '0' + num
-                    entry[categories[cat]] = num[:2] + '-' + num[2:]
+                    if re.search('^[0-9]+$', line[cat]):
+                        num = int(line[cat])
+                        high = num / 1000
+                        low = num % 1000
+                        entry[categories[cat]] = str(high) + '-' + str(low)
+                    else:
+                        entry[categories[cat]] = line[cat]
 
                 # If a category starts with a number, file it as a question
                 elif categories[cat][0].isdigit():
-                    entry['Questions'][categories[cat]] = line[cat]
+                    if line[cat] == None:
+                        entry['Questions'][categories[cat]] = None
+                    else:
+                        entry['Questions'][categories[cat]] = float(line[cat])
+
+                # General categories
+                elif line[cat] == None:
+                    entry['Questions'][categories[cat]] = None
+
+                elif re.search('^[0-9]+$', line[cat]):
+                    entry[categories[cat]] = int(line[cat])
+
+                elif re.search('^[0-9]+\.[0-9]+$', line[cat]):
+                    entry[categories[cat]] = float(line[cat])
 
                 else:
                     entry[categories[cat]] = line[cat]
