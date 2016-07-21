@@ -47,10 +47,8 @@ def parse_fces(path):
                 # Ensure course IDs have the proper format (##-###)
                 if categories[cat] == 'Course ID' and line[cat] != None:
                     if re.search('^[0-9]+$', line[cat]):
-                        num = int(line[cat])
-                        high = num / 1000
-                        low = num % 1000
-                        entry[categories[cat]] = str(high) + '-' + str(low)
+                        fmt = "%05d" % int(line[cat])
+                        entry[categories[cat]] = "%s-%s" % (fmt[:2], fmt[2:])
                     else:
                         entry[categories[cat]] = line[cat]
 
