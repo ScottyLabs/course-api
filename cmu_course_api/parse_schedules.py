@@ -39,7 +39,7 @@ lettered lecture and comprise much of this category of courses.
 
 import urllib.request
 import bs4
-
+import sys
 
 def get_page(quarter):
     '''
