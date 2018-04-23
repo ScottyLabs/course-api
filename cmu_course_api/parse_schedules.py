@@ -41,6 +41,15 @@ import urllib.request
 import bs4
 import sys
 
+QUARTERS = {
+    'S': 'spring',
+    'M1': 'summer_1',
+    'M2': 'summer_2',
+    'F': 'fall'
+}
+
+URL_FMT = 'http://enr-apps.as.cmu.edu/assets/SOC/sched_layout_%s.htm'
+
 def get_page(quarter):
     '''
     return a BeautifulSoup that represents the HTML page specified by quarter
@@ -49,16 +58,12 @@ def get_page(quarter):
 
     if get_page fails, None will be returned
     '''
-    # determine url
-    url = None
-    if quarter == 'S':
-        url = 'http://enr-apps.as.cmu.edu/assets/SOC/sched_layout_spring.htm'
-    elif quarter == 'M1':
-        url = 'http://enr-apps.as.cmu.edu/assets/SOC/sched_layout_summer_1.htm'
-    elif quarter == 'M2':
-        url = 'http://enr-apps.as.cmu.edu/assets/SOC/sched_layout_summer_2.htm'
-    elif quarter == 'F':
-        url = 'http://enr-apps.as.cmu.edu/assets/SOC/sched_layout_fall.htm'
+
+    # set the URL based on the requested quarter
+    if quarter not in QUARTERS:
+        raise ValueError('quarter %s is invalid, it must be one of %s' %
+                         (quarter, set(QUARTERS.keys())))
+    url = URL_FMT % QUARTERS[quarter]
 
     # obtain and return data
     try:
@@ -350,6 +355,8 @@ def extract_data_from_row(tr, data, curr_state):
 def parse_schedules(quarter):
     '''
     given a quarter, return a Python dictionary representing the data for it
+
+    quarter: one of ['S', 'M1', 'M2', 'F']
     '''
     # get the HTML page
     print('Requesting the HTML page from the network...')
