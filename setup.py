@@ -7,7 +7,7 @@
 from setuptools import setup
 
 setup(name='cmu-course-api',
-      version='1.5.1',
+      version='1.5.2',
       description=('Python utility for retrieving information about courses at'
                    ' Carnegie Mellon University.'),
       url='http://scottylabs.org/course-api',
