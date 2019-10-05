@@ -46,6 +46,12 @@ def aggregate(schedules):
     if count is None:
         count = 4
 
+    for course in schedules['schedules']:
+        queue.put(course)
+
+    queue_size = queue.qsize()
+    fces_processed = 0
+
     def run():
         while True:
             try:
@@ -53,7 +59,12 @@ def aggregate(schedules):
             except Empty:
                 return
 
-            print('Getting description for ' + course['num'] + '...')
+            nonlocal queue_size, fces_processed
+            with lock:
+                fces_processed += 1
+                
+            print('\r[{}/{}] Getting description for {}...'.format(
+                fces_processed, queue_size, course['num']), end="")
 
             desc = get_course_desc(course['num'], semester, year)
             desc['name'] = course['title']
@@ -78,9 +89,6 @@ def aggregate(schedules):
                 courses[number] = desc
             queue.task_done()
 
-    for course in schedules['schedules']:
-        queue.put(course)
-
     print("running on " + str(count) + " threads")
     for _ in range(count):
         thread = threading.Thread(target=run)
@@ -88,6 +96,7 @@ def aggregate(schedules):
         thread.start()
 
     queue.join()
+    print("")
 
     return {'courses': courses, 'rundate': str(date.today()),
             'semester': schedules['semester']}
