@@ -1,6 +1,5 @@
 # Course API
-
-The new version of the Scheduling API, now with prerequisites, course descriptions, FCEs and more!
+This is a command line tool for retrieving course information. For an updated RESTful API, check out [Course API v2](https://github.com/ScottyLabs/course-api-v2)
 
 This project is structured as a number of scraper scripts which parse
 information from various sources including the Course Catalog, the
